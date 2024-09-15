@@ -9,6 +9,8 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class MainPage {
 
+    private final SelenideElement personIcon = $("[data-testid='PersonIcon']");
+    private final SelenideElement friendButton = $("li [href='/people/friends']");
     private final ElementsCollection tableRows = $("#spendings tbody").$$("tr");
     private final SelenideElement mainPageRootContainer = $("[class^='MuiBox-root']");
 
@@ -23,5 +25,11 @@ public class MainPage {
 
     public void checkThatPageContainsRootContainer() {
         mainPageRootContainer.shouldBe(visible);
+    }
+
+    public FriendPage clickOnFriendButtonUnderPersonIcon() {
+        personIcon.click();
+        friendButton.click();
+        return new FriendPage();
     }
 }
