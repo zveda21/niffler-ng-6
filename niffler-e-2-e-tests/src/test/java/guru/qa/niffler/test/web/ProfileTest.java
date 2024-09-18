@@ -22,13 +22,13 @@ public class ProfileTest {
             )
     )
     @Test
-    void archivedCategoryShouldPresentInCategoriesList(CategoryJson category) {
+    void archivedCategoryShouldBePresentInCategoriesList(CategoryJson category) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .successLogin("duck", "12345")
-                .checkThatPageLoaded();
-
-        Selenide.open(CFG.frontUrl() + "profile", ProfilePage.class)
-                .checkArchivedCategoryExists(category.name());
+                .login("duck", "12345");
+        new ProfilePage().clickOnPersonIcon()
+                .clickOnProfileButton()
+                .clickOnShowArchivedToggle()
+                .checkArchivedCategoryName(category.name());
     }
 
     @User(
@@ -40,10 +40,9 @@ public class ProfileTest {
     @Test
     void activeCategoryShouldPresentInCategoriesList(CategoryJson category) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .successLogin("duck", "12345")
-                .checkThatPageLoaded();
-
-        Selenide.open(CFG.frontUrl() + "profile", ProfilePage.class)
-                .checkCategoryExists(category.name());
+                .login("duck", "12345");
+        new ProfilePage().clickOnPersonIcon()
+                .clickOnProfileButton()
+                .checkActiveCategoriesIsVisible(category.name());
     }
 }
