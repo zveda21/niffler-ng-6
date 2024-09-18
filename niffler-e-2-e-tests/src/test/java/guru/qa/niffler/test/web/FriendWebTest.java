@@ -3,44 +3,20 @@ package guru.qa.niffler.test.web;
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.extension.BrowserExtension;
-import guru.qa.niffler.jupiter.extension.UsersQueueExtension2;
+import guru.qa.niffler.jupiter.extension.UsersQueueExtension;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static guru.qa.niffler.jupiter.extension.UsersQueueExtension2.UserType.Type.*;
+import static guru.qa.niffler.jupiter.extension.UsersQueueExtension.UserType.Type.*;
 
-@ExtendWith(BrowserExtension.class)
+@ExtendWith({BrowserExtension.class, UsersQueueExtension.class})
 public class FriendWebTest {
     private static final Config CFG = Config.getInstance();
 
-//    @Test
-//    void testWithEmptyUser0(@UsersQueueExtension.UserType (empty = true)UsersQueueExtension.StaticUser user) throws InterruptedException {
-//        Thread.sleep(1000);
-//        System.out.println("user -- " + user);
-//    }
-//
-//    @Test
-//    void testWithEmptyUser1(@UsersQueueExtension.UserType (empty = true)UsersQueueExtension.StaticUser user) throws InterruptedException {
-//        Thread.sleep(1000);
-//        System.out.println("user -- " + user);
-//    }
-//    @Test
-//    void testWithEmptyUser2(@UsersQueueExtension.UserType (empty = false)UsersQueueExtension.StaticUser user) throws InterruptedException {
-//        Thread.sleep(1000);
-//        System.out.println("user -- " + user);
-//    }
-//
-//    @Test
-//    void testWithEmptyUser3(@UsersQueueExtension.UserType (empty = false)UsersQueueExtension.StaticUser user) throws InterruptedException {
-//        Thread.sleep(1000);
-//        System.out.println("user -- " + user);
-//    }
-
     @Test
-    @ExtendWith(UsersQueueExtension2.class)
-    void friendShouldBePresentInFriendsTable(@UsersQueueExtension2.UserType(WITH_FRIEND) UsersQueueExtension2.StaticUser user) {
+    void friendShouldBePresentInFriendsTable(@UsersQueueExtension.UserType(WITH_FRIEND) UsersQueueExtension.StaticUser user) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .login(user.username(), user.password());
         new MainPage().clickOnFriendButtonUnderPersonIcon()
@@ -49,8 +25,7 @@ public class FriendWebTest {
     }
 
     @Test
-    @ExtendWith(UsersQueueExtension2.class)
-    void friendsTableShouldBeEmptyForNewUser(@UsersQueueExtension2.UserType(EMPTY) UsersQueueExtension2.StaticUser user) {
+    void friendsTableShouldBeEmptyForNewUser(@UsersQueueExtension.UserType(EMPTY) UsersQueueExtension.StaticUser user) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .login(user.username(), user.password());
         new MainPage().clickOnFriendButtonUnderPersonIcon()
@@ -59,8 +34,7 @@ public class FriendWebTest {
     }
 
     @Test
-    @ExtendWith(UsersQueueExtension2.class)
-    void incomeInvitationBePresentInFriendsTable(@UsersQueueExtension2.UserType(WITH_INCOME_REQUEST) UsersQueueExtension2.StaticUser user) {
+    void incomeInvitationBePresentInFriendsTable(@UsersQueueExtension.UserType(WITH_INCOME_REQUEST) UsersQueueExtension.StaticUser user) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .login(user.username(), user.password());
         new MainPage().clickOnFriendButtonUnderPersonIcon()
@@ -69,13 +43,11 @@ public class FriendWebTest {
     }
 
     @Test
-    @ExtendWith(UsersQueueExtension2.class)
-    void outcomeInvitationBePresentInAllPeoplesTable(@UsersQueueExtension2.UserType(WITH_OUTCOME_REQUEST) UsersQueueExtension2.StaticUser user) {
+    void outcomeInvitationBePresentInAllPeoplesTable(@UsersQueueExtension.UserType(WITH_OUTCOME_REQUEST) UsersQueueExtension.StaticUser user) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .login(user.username(), user.password());
         new MainPage().clickOnFriendButtonUnderPersonIcon()
                 .clickOnAllPeopleButton()
                 .checkIfOutcomeFriendRequestIsVisibleInAllList(user.outcome());
     }
-
 }

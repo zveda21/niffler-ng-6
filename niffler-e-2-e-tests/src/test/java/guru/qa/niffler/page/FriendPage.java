@@ -15,7 +15,7 @@ public class FriendPage {
     private final SelenideElement emptyFriendPanelText = $("#simple-tabpanel-friends [class^='MuiTypography-root']");
     private final ElementsCollection friendsList = $$("#friends>tr p:nth-child(1)");
     private final ElementsCollection friendNameInRequestsList = $$("#requests tr td:nth-child(1) p:nth-child(1)");
-    private final ElementsCollection allPeopleList = $$("#all tr" );
+    private final ElementsCollection allPeopleList = $$("#all tr");
 
     public FriendPage clickOnFriendButton() {
         friendsButton.click();
@@ -40,8 +40,6 @@ public class FriendPage {
     }
 
     public void checkIfOutcomeFriendRequestIsVisibleInAllList(String friendName) {
-        allPeopleList.findBy(text(friendName)).shouldBe(visible);
-        allPeopleList.findBy(text(friendName)).shouldHave(text("Waiting..."));
+        allPeopleList.findBy(text(friendName)).shouldBe(visible).shouldHave(text("Waiting..."));
     }
-
 }
