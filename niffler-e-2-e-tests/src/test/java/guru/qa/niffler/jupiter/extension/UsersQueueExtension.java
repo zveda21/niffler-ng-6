@@ -60,11 +60,7 @@ public class UsersQueueExtension implements
     public void beforeTestExecution(ExtensionContext context) {
         //create the user map from the context store
         @SuppressWarnings("unchecked")
-        Map<UserType.Type, StaticUser> userMap = (Map<UserType.Type, StaticUser>) context.getStore(NAMESPACE)
-                .getOrComputeIfAbsent(
-                        context.getUniqueId(),
-                        key -> new HashMap<>()
-                );
+        Map<UserType.Type, StaticUser> userMap = new HashMap<>();
 
         Arrays.stream(context.getRequiredTestMethod().getParameters())
                 .filter(p -> AnnotationSupport.isAnnotated(p, UserType.class))
@@ -72,9 +68,6 @@ public class UsersQueueExtension implements
                     UserType userType = p.getAnnotation(UserType.class);
                     StaticUser user = fetchUser(userType.value());
 
-                    if (user == null) {
-                        throw new IllegalStateException("Cannot obtain user of type " + userType.value() + " after 30 seconds.");
-                    }
                     Allure.getLifecycle().updateTestCase(testCase ->
                             testCase.setStart(new Date().getTime())
                     );
@@ -104,7 +97,9 @@ public class UsersQueueExtension implements
         while (userOptional.isEmpty() && sw.getTime(TimeUnit.SECONDS) < 30) {
             userOptional = Optional.ofNullable(queue.poll());
         }
-        return userOptional.orElse(null);
+        return userOptional.orElseThrow(() ->
+                new IllegalStateException("Cannot obtain user of type " + userType + " after 30 seconds.")
+        );
     }
 
     @Override
