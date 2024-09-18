@@ -5,13 +5,13 @@ import com.github.javafaker.Faker;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
 
 @WebTest
 public class LoginTest {
 
   private static final Config CFG = Config.getInstance();
-  private static final Faker faker = new Faker();
 
   @Test
   void mainPageShouldBeDisplayedAfterSuccessLogin() {
@@ -23,7 +23,7 @@ public class LoginTest {
   @Test
   void userShouldStayOnLoginPageAfterLoginWithBadCredentials() {
     LoginPage loginPage = Selenide.open(CFG.frontUrl(), LoginPage.class);
-    loginPage.login(faker.name().username(), "BAD");
+    loginPage.login(RandomDataUtils.randomUsername(), "BAD");
     loginPage.checkError("Bad credentials");
   }
 }
