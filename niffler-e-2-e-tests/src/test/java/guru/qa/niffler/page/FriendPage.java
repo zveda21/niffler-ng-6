@@ -40,7 +40,6 @@ public class FriendPage {
     }
 
     public void checkIfOutcomeFriendRequestIsVisibleInAllList(String friendName) {
-        allPeopleList.findBy(text(friendName)).shouldBe(visible);
-        allPeopleList.findBy(text(friendName)).shouldHave(text("Waiting..."));
+        allPeopleList.findBy(text(friendName)).shouldBe(visible).shouldHave(text("Waiting..."));
     }
 }
