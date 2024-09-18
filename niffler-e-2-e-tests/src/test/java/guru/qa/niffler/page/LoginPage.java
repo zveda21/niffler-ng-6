@@ -7,30 +7,27 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class LoginPage {
 
-  private final SelenideElement usernameInput = $("input[name='username']");
-  private final SelenideElement passwordInput = $("input[name='password']");
-  private final SelenideElement submitButton = $("button[type='submit']");
-  private final SelenideElement registerButton = $("a[href='/register']");
-  private final SelenideElement errorContainer = $(".form__error");
+    private final SelenideElement usernameInput = $("input[name='username']");
+    private final SelenideElement passwordInput = $("input[name='password']");
+    private final SelenideElement submitButton = $("button[type='submit']");
+    private final SelenideElement createNewAccountButton = $(".form__register");
+    private final SelenideElement errorMessage = $(".form__error-container");
 
-  public RegisterPage doRegister() {
-    registerButton.click();
-    return new RegisterPage();
-  }
+    public LoginPage login(String username, String password) {
+        usernameInput.setValue(username);
+        passwordInput.setValue(password);
+        submitButton.click();
+        return this;
+    }
 
-  public MainPage successLogin(String username, String password) {
-    login(username, password);
-    return new MainPage();
-  }
+    // Method to navigate to the registration page
+    public RegisterPage clickOnCreateNewAccountButton() {
+        createNewAccountButton.click();
+        return new RegisterPage();
+    }
 
-  public void login(String username, String password) {
-    usernameInput.setValue(username);
-    passwordInput.setValue(password);
-    submitButton.click();
-  }
-
-  public LoginPage checkError(String error) {
-    errorContainer.shouldHave(text(error));
-    return this;
-  }
+    // Method to check if an error message is displayed
+    public void checkIfErrorMessageDisplayed(String message) {
+        errorMessage.shouldHave(text(message));
+    }
 }

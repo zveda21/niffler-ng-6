@@ -7,32 +7,38 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class RegisterPage {
 
-  private final SelenideElement usernameInput = $("input[name='username']");
-  private final SelenideElement passwordInput = $("input[name='password']");
-  private final SelenideElement passwordSubmitInput = $("input[name='passwordSubmit']");
-  private final SelenideElement submitButton = $("button[type='submit']");
-  private final SelenideElement proceedLoginButton = $(".form_sign-in");
-  private final SelenideElement errorContainer = $(".form__error");
+    private final SelenideElement usernameInput = $("#username");
+    private final SelenideElement passwordInput = $("#password");
+    private final SelenideElement submitPasswordInput = $("#passwordSubmit");
+    private final SelenideElement signUpButton = $("button.form__submit");
+    private final SelenideElement errorMessage = $(".form__error");
+    private final SelenideElement successRegistryMessage = $("[class^='form__paragraph']");
 
-  public RegisterPage fillRegisterPage(String login, String password, String passwordSubmit) {
-    usernameInput.setValue(login);
-    passwordInput.setValue(password);
-    passwordSubmitInput.setValue(passwordSubmit);
-    return this;
-  }
+    public RegisterPage setUsername(String username) {
+        usernameInput.setValue(username);
+        return this;
+    }
 
-  public LoginPage successSubmit() {
-    submit();
-    proceedLoginButton.click();
-    return new LoginPage();
-  }
+    public RegisterPage setPassword(String password) {
+        passwordInput.setValue(password);
+        return this;
+    }
 
-  public void submit() {
-    submitButton.click();
-  }
+    public RegisterPage setPasswordSubmit(String password) {
+        submitPasswordInput.setValue(password);
+        return this;
+    }
 
-  public RegisterPage checkAlertMessage(String errorMessage) {
-    errorContainer.shouldHave(text(errorMessage));
-    return this;
-  }
+    public RegisterPage submitRegistration() {
+        signUpButton.click();
+        return this;
+    }
+
+    public void checkThatErrorMessageDisplayed(String error) {
+        errorMessage.shouldHave(text(error));
+    }
+
+    public void checkThatSuccessRegistryMessageDisplayed(String successMessage) {
+        successRegistryMessage.shouldHave(text(successMessage));
+    }
 }

@@ -9,36 +9,27 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class MainPage {
 
-  private final SelenideElement header = $("#root header");
-  private final SelenideElement headerMenu = $("ul[role='menu']");
-  private final ElementsCollection tableRows = $("#spendings tbody").$$("tr");
-  private final SelenideElement statComponent = $("#stat");
-  private final SelenideElement spendingTable = $("#spendings");
+    private final SelenideElement personIcon = $("[data-testid='PersonIcon']");
+    private final SelenideElement friendButton = $("li [href='/people/friends']");
+    private final ElementsCollection tableRows = $("#spendings tbody").$$("tr");
+    private final SelenideElement mainPageRootContainer = $("[class^='MuiBox-root']");
 
-  public FriendsPage friendsPage() {
-    header.$("button").click();
-    headerMenu.$$("li").find(text("Friends")).click();
-    return new FriendsPage();
-  }
+    public EditSpendingPage editSpending(String spendingDescription) {
+        tableRows.find(text(spendingDescription)).$$("td").get(5).click();
+        return new EditSpendingPage();
+    }
 
-  public PeoplePage allPeoplesPage() {
-    header.$("button").click();
-    headerMenu.$$("li").find(text("All People")).click();
-    return new PeoplePage();
-  }
+    public void checkThatTableContainsSpending(String spendingDescription) {
+        tableRows.find(text(spendingDescription)).should(visible);
+    }
 
-  public EditSpendingPage editSpending(String spendingDescription) {
-    tableRows.find(text(spendingDescription)).$$("td").get(5).click();
-    return new EditSpendingPage();
-  }
+    public void checkThatPageContainsRootContainer() {
+        mainPageRootContainer.shouldBe(visible);
+    }
 
-  public void checkThatTableContainsSpending(String spendingDescription) {
-    tableRows.find(text(spendingDescription)).should(visible);
-  }
-
-  public MainPage checkThatPageLoaded() {
-    statComponent.should(visible).shouldHave(text("Statistics"));
-    spendingTable.should(visible).shouldHave(text("History of Spendings"));
-    return this;
-  }
+    public FriendPage clickOnFriendButtonUnderPersonIcon() {
+        personIcon.click();
+        friendButton.click();
+        return new FriendPage();
+    }
 }
