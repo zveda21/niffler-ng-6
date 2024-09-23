@@ -32,7 +32,7 @@ public class CategoryExtension implements
                                 null,
                                 RandomDataUtils.randomName(),
                                 anno.username(),
-                                category.archived()
+                                false
                         );
 
                         CategoryJson created = spendApiClient.createCategory(categoryJson);
