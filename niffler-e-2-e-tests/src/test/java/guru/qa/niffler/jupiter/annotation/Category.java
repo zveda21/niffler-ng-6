@@ -10,12 +10,11 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-@ExtendWith({CategoryExtension.class})
+@ExtendWith(CategoryExtension.class)
 public @interface Category {
 
-    String username();
+  String username() default "";
 
-    String name();
+  boolean archived() default false;
 
-    boolean archived();
 }
