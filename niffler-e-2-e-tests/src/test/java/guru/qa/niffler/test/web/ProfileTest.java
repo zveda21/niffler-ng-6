@@ -24,7 +24,7 @@ public class ProfileTest {
     @Test
     void archivedCategoryShouldBePresentInCategoriesList(CategoryJson category) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login("duck", "12345");
+                .login(category.username(), "12345");
         new ProfilePage().clickOnPersonIcon()
                 .clickOnProfileButton()
                 .clickOnShowArchivedToggle()
@@ -40,7 +40,7 @@ public class ProfileTest {
     @Test
     void activeCategoryShouldPresentInCategoriesList(CategoryJson category) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login("duck", "12345");
+                .login(category.username(), "12345");
         new ProfilePage().clickOnPersonIcon()
                 .clickOnProfileButton()
                 .checkActiveCategoriesIsVisible(category.name());

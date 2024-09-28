@@ -1,16 +1,11 @@
 package guru.qa.niffler.jupiter.extension;
 
-import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.service.CategoryDbClient;
 import guru.qa.niffler.utils.RandomDataUtils;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 public class CategoryExtension implements
@@ -20,7 +15,7 @@ public class CategoryExtension implements
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
-    private final SpendApiClient spendApiClient = new SpendApiClient();
+    private final CategoryDbClient categoryDbClient = new CategoryDbClient();
 
     @Override
     public void beforeEach(ExtensionContext context) {
@@ -35,7 +30,7 @@ public class CategoryExtension implements
                                 false
                         );
 
-                        CategoryJson created = spendApiClient.createCategory(categoryJson);
+                        CategoryJson created = categoryDbClient.createCategoryIfNotExist(categoryJson);
                         if (category.archived()) {
                             CategoryJson archivedCategory = new CategoryJson(
                                     created.id(),
@@ -43,7 +38,7 @@ public class CategoryExtension implements
                                     created.username(),
                                     true
                             );
-                            created = spendApiClient.updateCategory(archivedCategory);
+                            created = categoryDbClient.createCategoryIfNotExist(archivedCategory);
                         }
 
                         context.getStore(NAMESPACE).put(
@@ -65,7 +60,7 @@ public class CategoryExtension implements
                         category.username(),
                         true
                 );
-                spendApiClient.updateCategory(category);
+                categoryDbClient.deleteCategory(category);
             }
         }
     }

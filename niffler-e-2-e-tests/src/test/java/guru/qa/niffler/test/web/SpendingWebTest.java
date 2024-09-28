@@ -17,12 +17,12 @@ public class SpendingWebTest {
     private static final Config CFG = Config.getInstance();
 
     @User(
-            username = "duck",
+            username = "zveda",
             categories = @Category(
                     archived = true
             ),
             spending = @Spending(
-                    category = "Обучение 2",
+                    category = "Обучение 28",
                     description = "Обучение Advanced 2.1",
                     amount = 65990
             )
@@ -32,7 +32,7 @@ public class SpendingWebTest {
         final String newDescription = "Обучение Niffler Next Generation";
 
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login("duck", "12345");
+                .login(spend.username(), "12345");
         new MainPage()
                 .editSpending(spend.description())
                 .setNewSpendingDescription(newDescription)
