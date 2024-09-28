@@ -20,7 +20,10 @@ public class SpendDbClient {
 
     public SpendJson createSpend(SpendJson spend) {
         SpendEntity spendEntity = SpendEntity.fromJson(spend);
-        if (spendEntity.getCategory().getId() == null) {
+        Optional<CategoryEntity> existingCategory = categoryDao.findCategoryById(spendEntity.getCategory().getId());
+        if (existingCategory.isPresent()) {
+            spendEntity.setCategory(existingCategory.get());
+        } else {
             CategoryEntity categoryEntity = categoryDao.create(spendEntity.getCategory());
             spendEntity.setCategory(categoryEntity);
         }

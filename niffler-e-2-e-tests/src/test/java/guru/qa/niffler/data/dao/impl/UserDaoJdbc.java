@@ -52,7 +52,7 @@ public class UserDaoJdbc implements UserDao {
     public Optional<UserEntity> findById(UUID id) {
         try (Connection connection = Databases.connection(CFG.userdataJdbcUrl())) {
             try (PreparedStatement ps = connection.prepareStatement(
-                    "SELECT * FROM user where id=?"
+                    "SELECT * FROM \"user\"  where id=?"
             )) {
                 ps.setObject(1, id);
                 ps.execute();
@@ -86,7 +86,7 @@ public class UserDaoJdbc implements UserDao {
 
         try (Connection connection = Databases.connection(CFG.userdataJdbcUrl())) {
             try (PreparedStatement ps = connection.prepareStatement(
-                    "SELECT * FROM user WHERE username = ?"
+                    "SELECT * FROM \"user\"  WHERE username = ?"
             )) {
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -117,7 +117,7 @@ public class UserDaoJdbc implements UserDao {
     public void delete(UserEntity user) {
         try (Connection connection = Databases.connection(CFG.userdataJdbcUrl())) {
             try (PreparedStatement ps = connection.prepareStatement(
-                    "DELETE FROM user WHERE id = ?"
+                    "DELETE FROM \"user\"  WHERE id = ?"
             )) {
                 ps.setObject(1, user.getId());
                 ps.execute();

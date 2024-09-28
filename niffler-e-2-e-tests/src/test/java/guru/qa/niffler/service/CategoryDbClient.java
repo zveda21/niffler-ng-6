@@ -15,7 +15,7 @@ public class CategoryDbClient {
     private final CategoryDao categoryDao = new CategoryDaoJdbc();
 
 
-    public CategoryJson createCategory(CategoryJson categoryJson) {
+    public CategoryJson createCategoryIfNotExist(CategoryJson categoryJson) {
         Optional<CategoryEntity> existingCategory = categoryDao.findCategoryByUsernameAndCategoryName(categoryJson.username(), categoryJson.name());
         if (existingCategory.isPresent()) {
             return CategoryJson.fromEntity(existingCategory.get());
@@ -40,11 +40,12 @@ public class CategoryDbClient {
         return categoryJsons;
     }
 
-    public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
-        return categoryDao.findCategoryByUsernameAndCategoryName(username, categoryName);
+    public Optional<CategoryJson> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
+        Optional<CategoryEntity> categoryEntity = categoryDao.findCategoryByUsernameAndCategoryName(username, categoryName);
+        return Optional.of(CategoryJson.fromEntity(categoryEntity.get()));
     }
 
-    public void deleteSpending(CategoryJson categoryJson) {
+    public void deleteCategory(CategoryJson categoryJson) {
         if (categoryJson == null) {
             throw new IllegalArgumentException("CategoryJson cannot be null");
         }

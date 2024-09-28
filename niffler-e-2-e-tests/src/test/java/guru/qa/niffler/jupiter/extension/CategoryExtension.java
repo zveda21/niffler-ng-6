@@ -30,7 +30,7 @@ public class CategoryExtension implements
                                 false
                         );
 
-                        CategoryJson created = categoryDbClient.createCategory(categoryJson);
+                        CategoryJson created = categoryDbClient.createCategoryIfNotExist(categoryJson);
                         if (category.archived()) {
                             CategoryJson archivedCategory = new CategoryJson(
                                     created.id(),
@@ -38,7 +38,7 @@ public class CategoryExtension implements
                                     created.username(),
                                     true
                             );
-                            created = categoryDbClient.createCategory(archivedCategory);
+                            created = categoryDbClient.createCategoryIfNotExist(archivedCategory);
                         }
 
                         context.getStore(NAMESPACE).put(
@@ -60,7 +60,7 @@ public class CategoryExtension implements
                         category.username(),
                         true
                 );
-                categoryDbClient.createCategory(category);
+                categoryDbClient.deleteCategory(category);
             }
         }
     }
