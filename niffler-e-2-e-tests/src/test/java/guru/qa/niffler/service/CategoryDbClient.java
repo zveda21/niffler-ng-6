@@ -2,6 +2,7 @@ package guru.qa.niffler.service;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.impl.CategoryDaoJdbc;
+import guru.qa.niffler.data.dao.impl.CategoryDaoSpringJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.model.CategoryJson;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static guru.qa.niffler.data.Databases.dataSource;
 import static guru.qa.niffler.data.Databases.transaction;
 
 public class CategoryDbClient {
@@ -77,4 +79,27 @@ public class CategoryDbClient {
                 CFG.spendJdbcUrl(),
                 TRANSACTION_ISOLATION_LEVEL);
     }
+
+    public List<CategoryJson> findAllCategoriesSpringJdbc() {
+        List<CategoryEntity> categoryEntities = new CategoryDaoSpringJdbc(dataSource(CFG.spendJdbcUrl())).findAll();
+        List<CategoryJson> categoryJsonList = new ArrayList<>();
+        for (CategoryEntity categoryEntity : categoryEntities) {
+            categoryJsonList.add(CategoryJson.fromEntity(categoryEntity));
+        }
+        return categoryJsonList;
+    }
+
+    public List<CategoryJson> findAllCategories() {
+        return transaction(connection -> {
+                    List<CategoryEntity> categoryEntities = new CategoryDaoJdbc(connection).findAll();
+                    List<CategoryJson> categoryJsonList = new ArrayList<>();
+                    for (CategoryEntity categoryEntity : categoryEntities) {
+                        categoryJsonList.add(CategoryJson.fromEntity(categoryEntity));
+                    }
+                    return categoryJsonList;
+                }, CFG.spendJdbcUrl(),
+                TRANSACTION_ISOLATION_LEVEL);
+    }
+
+
 }
