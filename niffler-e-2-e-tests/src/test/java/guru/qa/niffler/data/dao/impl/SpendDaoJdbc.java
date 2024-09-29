@@ -133,4 +133,40 @@ public class SpendDaoJdbc implements SpendDao {
             throw new RuntimeException("Error while connecting to the database for deleting spending with ID: " + spend.getId(), e);
         }
     }
+
+    @Override
+    public List<SpendEntity> findAll() {
+        List<SpendEntity> spendList = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM spend"
+        )) {
+            ps.execute();
+
+            try (ResultSet rs = ps.getResultSet()) {
+                while (rs.next()) {
+                    SpendEntity spendEntity = new SpendEntity();
+                    CategoryDaoJdbc categoryDaoJdbc = new CategoryDaoJdbc(connection);
+
+                    spendEntity.setId(rs.getObject("id", UUID.class));
+                    spendEntity.setUsername(rs.getString("username"));
+                    spendEntity.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
+                    spendEntity.setSpendDate(rs.getDate("spend_date"));
+                    spendEntity.setAmount(rs.getDouble("amount"));
+                    spendEntity.setDescription(rs.getString("description"));
+
+                    if (rs.getObject("category_id") != null) {
+                        UUID categoryId = UUID.fromString(rs.getString("category_id"));
+                        Optional<CategoryEntity> categoryEntity = categoryDaoJdbc.findCategoryById(categoryId);
+                        categoryEntity.ifPresent(spendEntity::setCategory);
+                    }
+
+                    spendList.add(spendEntity);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error while fetching all SpendEntities", e);
+        }
+        return spendList;
+
+    }
 }
