@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,7 +47,7 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
     }
 
     @Override
-    public Optional<AuthUserEntity> findAuthUserById(UUID id) {
+    public Optional<AuthUserEntity> findById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         return Optional.ofNullable(
                 jdbcTemplate.queryForObject(
@@ -59,11 +60,31 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
 
     @Override
     public Optional<AuthUserEntity> findByUsername(String username) {
-        return Optional.empty();
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        return Optional.ofNullable(
+                jdbcTemplate.queryForObject(
+                        "SELECT * FROM \"user\" WHERE username = ?",
+                        AuthUserEntityRowMapper.instance,
+                        username
+                )
+        );
     }
 
     @Override
     public void deleteAuthUser(AuthUserEntity userEntity) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.update(
+                "DELETE FROM \"user\" WHERE id = ?",
+                userEntity.getId()
+        );
+    }
 
+    @Override
+    public List<AuthUserEntity> findAll() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        return jdbcTemplate.query(
+                "SELECT * FROM \"user\"",
+                AuthUserEntityRowMapper.instance
+        );
     }
 }
