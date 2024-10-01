@@ -1,17 +1,16 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.data.entity.user.UserEntity;
+import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.*;
 import guru.qa.niffler.service.AuthUserDbClient;
+import guru.qa.niffler.service.CategoryDbClient;
 import guru.qa.niffler.service.SpendDbClient;
-import guru.qa.niffler.service.UserDBClient;
+import guru.qa.niffler.service.UserDbClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -44,7 +43,7 @@ public class JdbcTest {
     @Test
     void createAuthUserTest() {
         AuthUserDbClient authUserDbClient = new AuthUserDbClient();
-       String username = "testbyzi3";
+        String username = "testbyzi3";
         AuthUserJson authUserJson = authUserDbClient.createAuthUser(
                 new AuthUserJson(
                         null,
@@ -126,7 +125,7 @@ public class JdbcTest {
 
     @Test
     void userDaoTest() {
-        UserDBClient userDBClient = new UserDBClient();
+        UserDbClient userDBClient = new UserDbClient();
         byte[] emptyData = new byte[0];
         byte[] emptyData2 = new byte[0];
 
@@ -136,12 +135,86 @@ public class JdbcTest {
                         "zvedik2",
                         CurrencyValues.USD,
                         "test",
-                        "test",
-                        "test",
                         emptyData,
-                        emptyData2
+                        emptyData2,
+                        "test",
+                        "test"
                 )
         );
         System.out.println(userEntity.getId());
+    }
+
+    @Test
+    void springJdbcTest() {
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUserSpringJdbc(
+                new UserJson(
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        "valentin-13",
+                        "valentin-13",
+                        "valentin-13",
+                        "valentin-13",
+                        null
+                )
+        );
+        System.out.println(user);
+    }
+
+    @Test
+    void createSpendUsingSpringJdbcTest() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        SpendJson spend = spendDbClient.createSpendUsingSpringJdbc(
+                new SpendJson(
+                        null,
+                        new Date(),
+                        new CategoryJson(
+                                null,
+                                "cat-name-tx-47_byzi",
+                                "duck",
+                                false
+                        ),
+                        CurrencyValues.RUB,
+                        1000.0,
+                        "spend-name-tx_byzi",
+                        "duck"
+                )
+        );
+
+        System.out.println("spend--" + spend);
+    }
+
+    @Test
+    void findAllSpendSpringJdbcTest(){
+        SpendDbClient spendDbClient = new SpendDbClient();
+        for (int i = 0; i < spendDbClient.findAllSpendsSpringJdbc().size(); i++) {
+            System.out.println("spends--" +spendDbClient.findAllSpendsSpringJdbc().get(i));
+        }
+    }
+
+    @Test
+    void findAllSpendsTest(){
+        SpendDbClient spendDbClient = new SpendDbClient();
+        for (int i = 0; i < spendDbClient.findAllSpends().size(); i++) {
+            System.out.println("spends--" +spendDbClient.findAllSpends().get(i));
+        }
+    }
+
+    @Test
+    void findAllCategoriesSpringJdbcTest(){
+        CategoryDbClient categoryDbClient = new CategoryDbClient();
+        for (int i = 0; i < categoryDbClient.findAllCategoriesSpringJdbc().size(); i++) {
+            System.out.println("categories--" +categoryDbClient.findAllCategoriesSpringJdbc().get(i));
+        }
+    }
+
+    @Test
+    void findAllCategoriesTest(){
+        CategoryDbClient categoryDbClient = new CategoryDbClient();
+        for (int i = 0; i < categoryDbClient.findAllCategories().size(); i++) {
+            System.out.println("categories--" +categoryDbClient.findAllCategories().get(i));
+        }
     }
 }
