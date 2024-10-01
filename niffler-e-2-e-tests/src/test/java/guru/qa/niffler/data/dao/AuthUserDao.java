@@ -10,9 +10,11 @@ public interface AuthUserDao {
 
     AuthUserEntity createUser(AuthUserEntity user);
 
-    Optional<AuthUserEntity> findAuthUserById(UUID id);
+    Optional<AuthUserEntity> findById(UUID id);
 
     Optional<AuthUserEntity> findByUsername(String username);
 
     void deleteAuthUser(AuthUserEntity userEntity);
+
+    List<AuthUserEntity> findAll();
 }

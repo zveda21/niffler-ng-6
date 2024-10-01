@@ -7,6 +7,8 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -57,7 +59,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
     }
 
     @Override
-    public Optional<AuthUserEntity> findAuthUserById(UUID id) {
+    public Optional<AuthUserEntity> findById(UUID id) {
         try (PreparedStatement ps = connection.prepareStatement(
                 "SELECT * FROM \"user\" WHERE id = ?"
         )) {
@@ -120,5 +122,29 @@ public class AuthUserDaoJdbc implements AuthUserDao {
         } catch (SQLException e) {
             throw new RuntimeException("Error while connecting to the database for deleting authUser with ID: " + userEntity.getId(), e);
         }
+    }
+
+    @Override
+    public List<AuthUserEntity> findAll() {
+        List<AuthUserEntity> userList = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM \"user\"")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    AuthUserEntity userEntity = new AuthUserEntity();
+                    userEntity.setId(rs.getObject("id", UUID.class));
+                    userEntity.setUsername(rs.getString("username"));
+                    userEntity.setPassword(rs.getString("password"));
+                    userEntity.setEnabled(rs.getBoolean("enabled"));
+                    userEntity.setAccountNonExpired(rs.getBoolean("account_non_expired"));
+                    userEntity.setAccountNonLocked(rs.getBoolean("account_non_locked"));
+                    userEntity.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
+                    userList.add(userEntity);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error while retrieving all auth users", e);
+        }
+        return userList;
     }
 }
