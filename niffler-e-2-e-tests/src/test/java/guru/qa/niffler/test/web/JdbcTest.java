@@ -1,20 +1,64 @@
 package guru.qa.niffler.test.web;
 
 import guru.qa.niffler.data.entity.user.UserEntity;
-import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.model.*;
+import guru.qa.niffler.service.AuthUserDbClient;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UserDBClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class JdbcTest {
+
+    @Test
+    void txTest() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+
+        SpendJson spend = spendDbClient.createSpend(
+                new SpendJson(
+                        null,
+                        new Date(),
+                        new CategoryJson(
+                                null,
+                                "cat-name-tx-46_byzi",
+                                "duck",
+                                false
+                        ),
+                        CurrencyValues.RUB,
+                        1000.0,
+                        "spend-name-tx_byzi",
+                        "duck"
+                )
+        );
+
+        System.out.println("spend--" + spend);
+    }
+
+    @Test
+    void createAuthUserTest() {
+        AuthUserDbClient authUserDbClient = new AuthUserDbClient();
+       String username = "testbyzi3";
+        AuthUserJson authUserJson = authUserDbClient.createAuthUser(
+                new AuthUserJson(
+                        null,
+                        "username",
+                        true,
+                        true,
+                        true,
+                        true,
+                        "12345"
+                )
+        );
+        System.out.println("userId--- " + authUserJson);
+
+    }
 
     @Test
     void daoTest() {
@@ -25,7 +69,7 @@ public class JdbcTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "Test by zi 2",
+                                "Test by zi 3",
                                 "duck",
                                 false
                         ),
@@ -41,8 +85,8 @@ public class JdbcTest {
     @Test
     void findSpendingByIdTest() {
         SpendDbClient client = new SpendDbClient();
-        SpendJson spend = client.findSpendById(UUID.fromString("0e6474c2-ca21-457a-9a0a-a6b792bc2b41"));
-        System.out.println(spend);
+        SpendJson spend = client.findSpendById(UUID.fromString("77ba42f4-7e54-11ef-9898-0242ac110002"));
+        System.out.println("spend--" + spend);
     }
 
     @Test
