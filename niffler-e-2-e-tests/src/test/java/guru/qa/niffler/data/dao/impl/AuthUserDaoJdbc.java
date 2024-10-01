@@ -57,7 +57,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
     }
 
     @Override
-    public Optional<AuthUserEntity> findAuthUserById(UUID id) {
+    public Optional<AuthUserEntity> findById(UUID id) {
         try (PreparedStatement ps = connection.prepareStatement(
                 "SELECT * FROM \"user\" WHERE id = ?"
         )) {
