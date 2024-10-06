@@ -285,13 +285,70 @@ public class JdbcTest {
                         CurrencyValues.RUB,
                         null,
                         null,
-                        "valentin-13",
-                        "valentin-13",
-                        "valentin-13",
-                        "TestByZi48",
+                        "valentin-16",
+                        "valentin-16",
+                        "valentin-16",
+                        "TestByZi49",
                         null
                 )
         );
         System.out.println(user);
+    }
+
+    @Test
+    void createUserJdbcWithRepo() {
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUserWithRepo(
+                new UserJson(
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "valentin-70",
+                        null
+                )
+        );
+        System.out.println(user);
+    }
+
+    @Test
+    void createUserJdbcWithRepo1() {
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson requester = usersDbClient.createUDUserWithRepo(
+                new UserJson(
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "requester20",
+                        null
+                )
+        );
+        System.out.println("requester-" + requester);
+        UserJson addressee = usersDbClient.createUDUserWithRepo(
+                new UserJson(
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "addressee19",
+                        null
+                )
+        );
+        System.out.println("addressee-" + addressee);
+
+        usersDbClient.addIncomeInvitation(requester, addressee);
+        usersDbClient.addOutcomeInvitation(requester,addressee);
+        usersDbClient.addFriend(requester, addressee);
+
     }
 }
