@@ -130,15 +130,16 @@ public class JdbcTest {
         byte[] emptyData2 = new byte[0];
 
         UserEntity userEntity = userDBClient.create(
-                new UserEntity(
+                new UserJson(
                         null,
-                        "zvedik2",
                         CurrencyValues.USD,
+                        "zvedik2",
                         "test",
-                        emptyData,
-                        emptyData2,
+                        null,
+                        null,
                         "test",
-                        "test"
+                        "test",
+                        null
                 )
         );
         System.out.println(userEntity.getId());
@@ -147,7 +148,7 @@ public class JdbcTest {
     @Test
     void springJdbcTest() {
         UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbc(
+        UserJson user = usersDbClient.createUser(
                 new UserJson(
                         null,
                         CurrencyValues.RUB,
@@ -156,7 +157,7 @@ public class JdbcTest {
                         "valentin-13",
                         "valentin-13",
                         "valentin-13",
-                        "valentin-13",
+                        "valentin-14",
                         null
                 )
         );
@@ -187,34 +188,110 @@ public class JdbcTest {
     }
 
     @Test
-    void findAllSpendSpringJdbcTest(){
+    void findAllSpendSpringJdbcTest() {
         SpendDbClient spendDbClient = new SpendDbClient();
         for (int i = 0; i < spendDbClient.findAllSpendsSpringJdbc().size(); i++) {
-            System.out.println("spends--" +spendDbClient.findAllSpendsSpringJdbc().get(i));
+            System.out.println("spends--" + spendDbClient.findAllSpendsSpringJdbc().get(i));
         }
     }
 
     @Test
-    void findAllSpendsTest(){
+    void findAllSpendsTest() {
         SpendDbClient spendDbClient = new SpendDbClient();
-        for (int i = 0; i < spendDbClient.findAllSpends().size(); i++) {
-            System.out.println("spends--" +spendDbClient.findAllSpends().get(i));
+        for (int i = 0; i < spendDbClient.findAllSpendsSpringJdbc().size(); i++) {
+            System.out.println("spends--" + spendDbClient.findAllSpendsSpringJdbc().get(i));
         }
     }
 
     @Test
-    void findAllCategoriesSpringJdbcTest(){
-        CategoryDbClient categoryDbClient = new CategoryDbClient();
-        for (int i = 0; i < categoryDbClient.findAllCategoriesSpringJdbc().size(); i++) {
-            System.out.println("categories--" +categoryDbClient.findAllCategoriesSpringJdbc().get(i));
-        }
-    }
-
-    @Test
-    void findAllCategoriesTest(){
+    void findAllCategoriesSpringJdbcTest() {
         CategoryDbClient categoryDbClient = new CategoryDbClient();
         for (int i = 0; i < categoryDbClient.findAllCategories().size(); i++) {
-            System.out.println("categories--" +categoryDbClient.findAllCategories().get(i));
+            System.out.println("categories--" + categoryDbClient.findAllCategories().get(i));
         }
+    }
+
+    @Test
+    void findAllCategoriesTest() {
+        CategoryDbClient categoryDbClient = new CategoryDbClient();
+        for (int i = 0; i < categoryDbClient.findAllCategories().size(); i++) {
+            System.out.println("categories--" + categoryDbClient.findAllCategories().get(i));
+        }
+    }
+
+    @Test
+    void createUserSpringJdbcTransactionTest() {
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUserSpringJdbcTransaction(
+                new UserJson(
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        "valentin-13",
+                        "valentin-13",
+                        "valentin-13",
+                        "TestByZi44",
+                        null
+                )
+        );
+        System.out.println(user);
+    }
+
+    @Test
+    void createUserSpringJdbcWithoutTransactionTest() {
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUserWithoutSpringJdbcTransaction(
+                new UserJson(
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        "valentin-13",
+                        "valentin-13",
+                        "valentin-13",
+                        "TestByZi46",
+                        null
+                )
+        );
+        System.out.println(user);
+    }
+
+    @Test
+    void createUserJdbcTransactionTest() {
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUserJdbcTransaction(
+                new UserJson(
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        "valentin-13",
+                        "valentin-13",
+                        "valentin-13",
+                        "TestByZi47",
+                        null
+                )
+        );
+        System.out.println(user);
+    }
+
+    @Test
+    void createUserJdbcWithoutTransactionTest() {
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUserWithoutJdbcTransaction(
+                new UserJson(
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        "valentin-13",
+                        "valentin-13",
+                        "valentin-13",
+                        "TestByZi48",
+                        null
+                )
+        );
+        System.out.println(user);
     }
 }
