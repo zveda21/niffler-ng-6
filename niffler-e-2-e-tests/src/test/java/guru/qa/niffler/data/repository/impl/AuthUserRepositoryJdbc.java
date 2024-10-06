@@ -60,20 +60,10 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
 
     @Override
     public Optional<AuthUserEntity> findById(UUID id) {
-        String sql = "SELECT a.id AS authority_id, " +
-                "a.authority, " +
-                "u.id AS id, " +
-                "u.username, " +
-                "u.password, " +
-                "u.enabled, " +
-                "u.account_non_expired, " +
-                "u.account_non_locked, " +
-                "u.credentials_non_expired " +
-                "FROM \"user\" u " +
-                "JOIN authority a ON u.id = a.user_id " +
-                "WHERE u.id = ?";
-
-        try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(sql)) {
+        try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+                "SELECT a.id AS authority_id, a.authority,u.id AS id, u.username,u.password,u.enabled, " +
+                        "u.account_non_expired,u.account_non_locked,u.credentials_non_expired FROM \"user\" u " +
+                        "JOIN authority a ON u.id = a.user_id WHERE u.id = ?")) {
             ps.setObject(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
