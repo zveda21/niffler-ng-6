@@ -9,6 +9,10 @@ import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
+import guru.qa.niffler.data.repository.AuthUserRepository;
+import guru.qa.niffler.data.repository.UserdataUserRepository;
+import guru.qa.niffler.data.repository.impl.AuthUserRepositoryJdbc;
+import guru.qa.niffler.data.repository.impl.UserdataUserRepositoryImpl;
 import guru.qa.niffler.data.tpl.DataSources;
 import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
@@ -37,6 +41,12 @@ public class UserDbClient {
     private final AuthUserDao authUserJdbcDao = new AuthUserDaoJdbc();
     private final AuthAuthorityDao authAuthorityJdbcDao = new AuthAuthorityDaoJdbc();
     private final UdUserDao udUserJdbcDao = new UdUserDaoJdbc();
+
+    //Auth user Repository
+    private final AuthUserRepository authUserRepository = new AuthUserRepositoryJdbc();
+
+    // userdata user Repository
+    private final UserdataUserRepository udUserRepository = new UserdataUserRepositoryImpl();
 
     private final TransactionTemplate txTemplate = new TransactionTemplate(
             new ChainedTransactionManager(
@@ -91,13 +101,42 @@ public class UserDbClient {
                     AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                             e -> {
                                 AuthorityEntity ae = new AuthorityEntity();
-                                ae.setUserId(createdAuthUser.getId());
+                                ae.setUser(createdAuthUser);
                                 ae.setAuthority(e);
                                 return ae;
                             }
                     ).toArray(AuthorityEntity[]::new);
 
                     authAuthorityDao.createAuthority(authorityEntities);
+                    return UserJson.fromEntity(
+                            udUserDao.createUser(UserEntity.fromJson(user)),
+                            null
+                    );
+                }
+        );
+    }
+
+
+    public UserJson createUserWithRepo(UserJson user) {
+        return xaTransactionTemplate.execute(() -> {
+                    AuthUserEntity authUser = new AuthUserEntity();
+                    authUser.setUsername(user.username());
+                    authUser.setPassword(pe.encode("12345"));
+                    authUser.setEnabled(true);
+                    authUser.setAccountNonExpired(true);
+                    authUser.setAccountNonLocked(true);
+                    authUser.setCredentialsNonExpired(true);
+                    authUser.setAuthorities(
+                            Arrays.stream(Authority.values()).map(
+                                    e -> {
+                                        AuthorityEntity ae = new AuthorityEntity();
+                                        ae.setUser(authUser);
+                                        ae.setAuthority(e);
+                                        return ae;
+                                    }
+                            ).toList()
+                    );
+                    authUserRepository.create(authUser);
                     return UserJson.fromEntity(
                             udUserDao.createUser(UserEntity.fromJson(user)),
                             null
@@ -121,7 +160,7 @@ public class UserDbClient {
                     AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                             e -> {
                                 AuthorityEntity ae = new AuthorityEntity();
-                                ae.setUserId(createdAuthUser.getId());
+                                ae.setUser(createdAuthUser);
                                 ae.setAuthority(e);
                                 return ae;
                             }
@@ -150,7 +189,7 @@ public class UserDbClient {
         AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
-                    ae.setUserId(createdAuthUser.getId());
+                    ae.setUser(createdAuthUser);
                     ae.setAuthority(e);
                     return ae;
                 }
@@ -178,7 +217,7 @@ public class UserDbClient {
                     AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                             e -> {
                                 AuthorityEntity ae = new AuthorityEntity();
-                                ae.setUserId(createdAuthUser.getId());
+                                ae.setUser(createdAuthUser);
                                 ae.setAuthority(e);
                                 return ae;
                             }
@@ -207,7 +246,7 @@ public class UserDbClient {
         AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
-                    ae.setUserId(createdAuthUser.getId());
+                    ae.setUser(createdAuthUser);
                     ae.setAuthority(e);
                     return ae;
                 }
@@ -218,5 +257,34 @@ public class UserDbClient {
                 udUserJdbcDao.createUser(UserEntity.fromJson(user)),
                 null
         );
+    }
+
+    public UserJson createUDUserWithRepo(UserJson user) {
+        return xaTransactionTemplate.execute(() -> UserJson.fromEntity(
+                udUserRepository.create(UserEntity.fromJson(user)),
+                null
+        )
+        );
+    }
+
+    public void addIncomeInvitation(UserJson requester, UserJson addressee) {
+        xaTransactionTemplate.execute(() -> {
+            udUserRepository.addIncomeInvitation(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
+            return null;
+        });
+    }
+
+    public void addOutcomeInvitation(UserJson requester, UserJson addressee) {
+        xaTransactionTemplate.execute(() -> {
+            udUserRepository.addOutcomeInvitation(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
+            return null;
+        });
+    }
+
+    public void addFriend(UserJson requester, UserJson addressee) {
+        xaTransactionTemplate.execute(() -> {
+            udUserRepository.addFriend(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
+            return null;
+        });
     }
 }
