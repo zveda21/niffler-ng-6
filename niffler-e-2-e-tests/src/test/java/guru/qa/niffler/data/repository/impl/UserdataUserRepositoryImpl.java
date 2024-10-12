@@ -78,6 +78,11 @@ public class UserdataUserRepositoryImpl implements UserdataUserRepository {
     }
 
     @Override
+    public Optional<UserEntity> findByUsername(String username) {
+        return Optional.empty();
+    }
+
+    @Override
     public void addIncomeInvitation(UserEntity requester, UserEntity addressee) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
                 "INSERT INTO friendship (requester_id, addressee_id, created_date , status) VALUES (?, ?, NOW(),?)")) {

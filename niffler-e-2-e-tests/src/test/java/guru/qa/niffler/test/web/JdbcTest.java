@@ -7,6 +7,8 @@ import guru.qa.niffler.service.CategoryDbClient;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UserDbClient;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
 import java.util.List;
@@ -43,7 +45,7 @@ public class JdbcTest {
     @Test
     void createAuthUserTest() {
         AuthUserDbClient authUserDbClient = new AuthUserDbClient();
-        String username = "testbyzi3";
+        String username = "testbyzi8";
         AuthUserJson authUserJson = authUserDbClient.createAuthUser(
                 new AuthUserJson(
                         null,
@@ -326,7 +328,7 @@ public class JdbcTest {
                         null,
                         null,
                         null,
-                        "requester20",
+                        "requester22",
                         null
                 )
         );
@@ -340,7 +342,7 @@ public class JdbcTest {
                         null,
                         null,
                         null,
-                        "addressee19",
+                        "addressee22",
                         null
                 )
         );
@@ -350,5 +352,24 @@ public class JdbcTest {
         usersDbClient.addOutcomeInvitation(requester,addressee);
         usersDbClient.addFriend(requester, addressee);
 
+    }
+
+    static UserDbClient usersDbClient = new UserDbClient();
+
+    @ValueSource(strings = {
+            "valentin-19",
+            "valentin-17",
+            "valentin-18"
+    })
+    @ParameterizedTest
+    void springJdbcTestwww(String uname) {
+
+        UserJson user = usersDbClient.createUser(
+                uname,
+                "12345"
+        );
+
+        usersDbClient.addIncomeInvitation(user, 1);
+        usersDbClient.addOutcomeInvitation(user, 1);
     }
 }
