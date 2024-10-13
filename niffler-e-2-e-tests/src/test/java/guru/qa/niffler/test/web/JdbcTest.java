@@ -5,7 +5,7 @@ import guru.qa.niffler.model.*;
 import guru.qa.niffler.service.AuthUserDbClient;
 import guru.qa.niffler.service.CategoryDbClient;
 import guru.qa.niffler.service.SpendDbClient;
-import guru.qa.niffler.service.UserDbClient;
+import guru.qa.niffler.service.UsersDbClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -126,47 +126,6 @@ public class JdbcTest {
     }
 
     @Test
-    void userDaoTest() {
-        UserDbClient userDBClient = new UserDbClient();
-        byte[] emptyData = new byte[0];
-        byte[] emptyData2 = new byte[0];
-
-        UserEntity userEntity = userDBClient.create(
-                new UserJson(
-                        null,
-                        CurrencyValues.USD,
-                        "zvedik2",
-                        "test",
-                        null,
-                        null,
-                        "test",
-                        "test",
-                        null
-                )
-        );
-        System.out.println(userEntity.getId());
-    }
-
-    @Test
-    void springJdbcTest() {
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUser(
-                new UserJson(
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        "valentin-13",
-                        "valentin-13",
-                        "valentin-13",
-                        "valentin-14",
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-    @Test
     void createSpendUsingSpringJdbcTest() {
         SpendDbClient spendDbClient = new SpendDbClient();
         SpendJson spend = spendDbClient.createSpendUsingSpringJdbc(
@@ -221,153 +180,21 @@ public class JdbcTest {
         }
     }
 
-    @Test
-    void createUserSpringJdbcTransactionTest() {
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbcTransaction(
-                new UserJson(
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        "valentin-13",
-                        "valentin-13",
-                        "valentin-13",
-                        "TestByZi44",
-                        null
-                )
-        );
-        System.out.println(user);
-    }
 
-    @Test
-    void createUserSpringJdbcWithoutTransactionTest() {
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserWithoutSpringJdbcTransaction(
-                new UserJson(
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        "valentin-13",
-                        "valentin-13",
-                        "valentin-13",
-                        "TestByZi46",
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-    @Test
-    void createUserJdbcTransactionTest() {
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserJdbcTransaction(
-                new UserJson(
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        "valentin-13",
-                        "valentin-13",
-                        "valentin-13",
-                        "TestByZi47",
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-    @Test
-    void createUserJdbcWithoutTransactionTest() {
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserWithoutJdbcTransaction(
-                new UserJson(
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        "valentin-17",
-                        "valentin-17",
-                        "valentin-17",
-                        "TestByZi50",
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-    @Test
-    void createUserJdbcWithRepo() {
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserWithRepo(
-                new UserJson(
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        "valentin-71",
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-    @Test
-    void createUserJdbcWithRepo1() {
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson requester = usersDbClient.createUDUserWithRepo(
-                new UserJson(
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        "requester23",
-                        null
-                )
-        );
-        System.out.println("requester-" + requester);
-        UserJson addressee = usersDbClient.createUDUserWithRepo(
-                new UserJson(
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        "addressee23",
-                        null
-                )
-        );
-        System.out.println("addressee-" + addressee);
-
-        usersDbClient.addIncomeInvitation(requester, addressee);
-        usersDbClient.addOutcomeInvitation(requester,addressee);
-        usersDbClient.addFriend(requester, addressee);
-
-    }
-
-    static UserDbClient usersDbClient = new UserDbClient();
+    static UsersDbClient usersDbClient = new UsersDbClient();
 
     @ValueSource(strings = {
-            "valentin-25",
+            "zveda15"
     })
     @ParameterizedTest
-    void springJdbcTest(String uname) {
+    void springJdbcTestJNDI(String uname) {
 
         UserJson user = usersDbClient.createUser(
                 uname,
                 "12345"
         );
 
-        usersDbClient.addIncomeInvitation(user, 1);
-        usersDbClient.addOutcomeInvitation(user, 1);
+        usersDbClient.createIncomeInvitations(user, 1);
+        usersDbClient.createOutcomeInvitations(user, 1);
     }
 }
