@@ -1,12 +1,20 @@
 package guru.qa.niffler.jupiter.extension;
 
+import com.github.jknack.handlebars.internal.lang3.ArrayUtils;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.CategoryDbClient;
-import guru.qa.niffler.utils.RandomDataUtils;
+import guru.qa.niffler.service.SpendClient;
+import guru.qa.niffler.service.SpendDbClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 
 public class CategoryExtension implements
         BeforeEachCallback,
@@ -16,52 +24,56 @@ public class CategoryExtension implements
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
     private final CategoryDbClient categoryDbClient = new CategoryDbClient();
+    private final SpendClient spendClient = new SpendDbClient();
 
     @Override
     public void beforeEach(ExtensionContext context) {
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
-                .ifPresent(anno -> {
-                    if (anno.categories().length > 0) {
-                        Category category = anno.categories()[0];
-                        CategoryJson categoryJson = new CategoryJson(
-                                null,
-                                RandomDataUtils.randomName(),
-                                anno.username(),
-                                false
-                        );
+                .ifPresent(userAnno -> {
+                    if (ArrayUtils.isNotEmpty(userAnno.categories())) {
+                        List<CategoryJson> result = new ArrayList<>();
 
-                        CategoryJson created = categoryDbClient.createCategoryIfNotExist(categoryJson);
-                        if (category.archived()) {
-                            CategoryJson archivedCategory = new CategoryJson(
-                                    created.id(),
-                                    created.name(),
-                                    created.username(),
-                                    true
+                        UserJson user = context.getStore(UserExtension.NAMESPACE)
+                                .get(context.getUniqueId(), UserJson.class);
+
+                        for (Category categoryAnno : userAnno.categories()) {
+                            final String categoryName = "".equals(categoryAnno.name())
+                                    ? randomCategoryName()
+                                    : categoryAnno.name();
+
+                            CategoryJson category = new CategoryJson(
+                                    null,
+                                    categoryName,
+                                    user != null ? user.username() : userAnno.username(),
+                                    categoryAnno.archived()
                             );
-                            created = categoryDbClient.createCategoryIfNotExist(archivedCategory);
+
+                            CategoryJson createdCategory = spendClient.createCategory(category);
+                            result.add(createdCategory);
                         }
 
-                        context.getStore(NAMESPACE).put(
-                                context.getUniqueId(),
-                                created
-                        );
+                        if (user != null) {
+                            user.testData().categories().addAll(result);
+                        } else {
+                            context.getStore(NAMESPACE).put(
+                                    context.getUniqueId(),
+                                    result
+                            );
+                        }
                     }
                 });
     }
 
     @Override
     public void afterTestExecution(ExtensionContext context) {
-        CategoryJson category = context.getStore(NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
-        if (category != null) {
-            if (!category.archived()) {
-                category = new CategoryJson(
-                        category.id(),
-                        category.name(),
-                        category.username(),
-                        true
-                );
-                categoryDbClient.deleteCategory(category);
-            }
+        UserJson user = context.getStore(UserExtension.NAMESPACE).get(context.getUniqueId(), UserJson.class);
+
+        List<CategoryJson> categories = user != null
+                ? user.testData().categories() :
+                context.getStore(NAMESPACE).get(context.getUniqueId(), List.class);
+
+        for (CategoryJson category : categories) {
+            spendClient.removeCategory(category);
         }
     }
 
