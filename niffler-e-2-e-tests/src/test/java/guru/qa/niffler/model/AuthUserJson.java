@@ -24,10 +24,10 @@ public record AuthUserJson(
         return new AuthUserJson(
                 entity.getId(),
                 entity.getUsername(),
-                entity.isAccountNonExpired(),
-                entity.isAccountNonLocked(),
-                entity.isCredentialsNonExpired(),
-                entity.isEnabled(),
+                entity.getAccountNonExpired(),
+                entity.getAccountNonLocked(),
+                entity.getCredentialsNonExpired(),
+                entity.getEnabled(),
                 entity.getPassword()
         );
     }
