@@ -287,10 +287,10 @@ public class JdbcTest {
                         CurrencyValues.RUB,
                         null,
                         null,
-                        "valentin-16",
-                        "valentin-16",
-                        "valentin-16",
-                        "TestByZi49",
+                        "valentin-17",
+                        "valentin-17",
+                        "valentin-17",
+                        "TestByZi50",
                         null
                 )
         );
@@ -309,7 +309,7 @@ public class JdbcTest {
                         null,
                         null,
                         null,
-                        "valentin-70",
+                        "valentin-71",
                         null
                 )
         );
@@ -328,7 +328,7 @@ public class JdbcTest {
                         null,
                         null,
                         null,
-                        "requester22",
+                        "requester23",
                         null
                 )
         );
@@ -342,7 +342,7 @@ public class JdbcTest {
                         null,
                         null,
                         null,
-                        "addressee22",
+                        "addressee23",
                         null
                 )
         );
@@ -357,12 +357,10 @@ public class JdbcTest {
     static UserDbClient usersDbClient = new UserDbClient();
 
     @ValueSource(strings = {
-            "valentin-19",
-            "valentin-17",
-            "valentin-18"
+            "valentin-25",
     })
     @ParameterizedTest
-    void springJdbcTestwww(String uname) {
+    void springJdbcTest(String uname) {
 
         UserJson user = usersDbClient.createUser(
                 uname,
