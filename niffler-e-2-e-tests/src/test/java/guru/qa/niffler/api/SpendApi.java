@@ -44,4 +44,7 @@ public interface SpendApi {
             @Query("username") String username,
             @Query("excludeArchived") Boolean excludeArchived);
 
+    default void deleteCategory(int id) {
+        throw new UnsupportedOperationException("Category deletion is not supported.");
+    }
 }

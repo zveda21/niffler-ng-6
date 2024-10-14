@@ -18,6 +18,6 @@ public interface UserApi {
     Call<Void> acceptInvitation(@Body String receiverUsername);
 
     default void deleteUser(int id) {
-        throw new UnsupportedOperationException("Удаление пользователей не поддерживается.");
+        throw new UnsupportedOperationException("User deletion is not supported.");
     }
 }
