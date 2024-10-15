@@ -2,6 +2,7 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.config.Config;
 
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
@@ -9,6 +10,8 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 
 public class ProfilePage {
+
+    public static String profilePageUrl = Config.getInstance().frontUrl() + "profile";
 
     private final SelenideElement personIcon = $("[data-testid='PersonIcon']");
     private final SelenideElement profileButton = $("[href='/profile']");

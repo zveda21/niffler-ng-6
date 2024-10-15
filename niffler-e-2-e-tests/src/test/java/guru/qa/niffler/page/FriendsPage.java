@@ -2,13 +2,16 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.config.Config;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
-public class FriendPage {
+public class FriendsPage {
+
+    public static String friendsPageUrl = Config.getInstance().frontUrl() + "people/friends";
 
     private final SelenideElement friendsButton = $("div>a[href='/people/friends']");
     private final SelenideElement allPeopleButton = $("div>a[href='/people/all']");
@@ -17,12 +20,12 @@ public class FriendPage {
     private final ElementsCollection friendNameInRequestsList = $$("#requests tr td:nth-child(1) p:nth-child(1)");
     private final ElementsCollection allPeopleList = $$("#all tr");
 
-    public FriendPage clickOnFriendButton() {
+    public FriendsPage clickOnFriendButton() {
         friendsButton.click();
         return this;
     }
 
-    public FriendPage clickOnAllPeopleButton() {
+    public FriendsPage clickOnAllPeopleButton() {
         allPeopleButton.click();
         return this;
     }
