@@ -17,6 +17,7 @@ import guru.qa.niffler.data.tpl.DataSources;
 import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.UserJson;
+import lombok.NonNull;
 import org.springframework.data.transaction.ChainedTransactionManager;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -25,6 +26,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.Connection;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,22 +64,22 @@ public class UserDbClient {
             CFG.userdataJdbcUrl()
     );
 
-    public UserEntity create(UserJson userJson) {
-        return jdbcTemplate.execute(() -> udUserDao.createUser(UserEntity.fromJson(userJson)), TRANSACTION_ISOLATION_LEVEL);
+    public @NonNull UserEntity create(@NonNull UserJson userJson) {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> udUserDao.createUser(UserEntity.fromJson(userJson)), TRANSACTION_ISOLATION_LEVEL));
     }
 
-    public Optional<UserEntity> findById(UUID id) {
-        return jdbcTemplate.execute(() -> udUserDao.findById(id),
-                TRANSACTION_ISOLATION_LEVEL);
+    public @NonNull Optional<UserEntity> findById(@NonNull UUID id) {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> udUserDao.findById(id),
+                TRANSACTION_ISOLATION_LEVEL));
 
     }
 
-    public Optional<UserEntity> findByUsername(String username) {
-        return jdbcTemplate.execute(() -> udUserDao.findByUsername(username),
-                TRANSACTION_ISOLATION_LEVEL);
+    public @NonNull Optional<UserEntity> findByUsername(@NonNull String username) {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> udUserDao.findByUsername(username),
+                TRANSACTION_ISOLATION_LEVEL));
     }
 
-    public void delete(UserEntity user) {
+    public void delete(@NonNull UserEntity user) {
         jdbcTemplate.execute(() -> {
                     udUserDao.delete(user);
                     return null;
@@ -86,8 +88,8 @@ public class UserDbClient {
     }
 
     // spring jdbc xaTransaction
-    public UserJson createUser(UserJson user) {
-        return xaTransactionTemplate.execute(() -> {
+    public @NonNull UserJson createUser(@NonNull UserJson user) {
+        return Objects.requireNonNull(xaTransactionTemplate.execute(() -> {
                     AuthUserEntity authUser = new AuthUserEntity();
                     authUser.setUsername(user.username());
                     authUser.setPassword(pe.encode("12345"));
@@ -113,12 +115,12 @@ public class UserDbClient {
                             null
                     );
                 }
-        );
+        ));
     }
 
 
-    public UserJson createUserWithRepo(UserJson user) {
-        return xaTransactionTemplate.execute(() -> {
+    public @NonNull UserJson createUserWithRepo(@NonNull UserJson user) {
+        return Objects.requireNonNull(xaTransactionTemplate.execute(() -> {
                     AuthUserEntity authUser = new AuthUserEntity();
                     authUser.setUsername(user.username());
                     authUser.setPassword(pe.encode("12345"));
@@ -142,11 +144,11 @@ public class UserDbClient {
                             null
                     );
                 }
-        );
+        ));
     }
 
-    public UserJson createUserSpringJdbcTransaction(UserJson user) {
-        return txTemplate.execute(status -> {
+    public @NonNull UserJson createUserSpringJdbcTransaction(@NonNull UserJson user) {
+        return Objects.requireNonNull(txTemplate.execute(status -> {
                     AuthUserEntity authUser = new AuthUserEntity();
                     authUser.setUsername(user.username());
                     authUser.setPassword(pe.encode("12345"));
@@ -172,10 +174,10 @@ public class UserDbClient {
                             null
                     );
                 }
-        );
+        ));
     }
 
-    public UserJson createUserWithoutSpringJdbcTransaction(UserJson user) {
+    public @NonNull UserJson createUserWithoutSpringJdbcTransaction(@NonNull UserJson user) {
         AuthUserEntity authUser = new AuthUserEntity();
         authUser.setUsername(user.username());
         authUser.setPassword(pe.encode("12345"));
@@ -202,8 +204,8 @@ public class UserDbClient {
         );
     }
 
-    public UserJson createUserJdbcTransaction(UserJson user) {
-        return txTemplate.execute(status -> {
+    public @NonNull UserJson createUserJdbcTransaction(@NonNull UserJson user) {
+        return Objects.requireNonNull(txTemplate.execute(status -> {
                     AuthUserEntity authUser = new AuthUserEntity();
                     authUser.setUsername(user.username());
                     authUser.setPassword(pe.encode("12345"));
@@ -229,10 +231,10 @@ public class UserDbClient {
                             null
                     );
                 }
-        );
+        ));
     }
 
-    public UserJson createUserWithoutJdbcTransaction(UserJson user) {
+    public @NonNull UserJson createUserWithoutJdbcTransaction(@NonNull UserJson user) {
         AuthUserEntity authUser = new AuthUserEntity();
         authUser.setUsername(user.username());
         authUser.setPassword(pe.encode("12345"));
@@ -259,29 +261,29 @@ public class UserDbClient {
         );
     }
 
-    public UserJson createUDUserWithRepo(UserJson user) {
-        return xaTransactionTemplate.execute(() -> UserJson.fromEntity(
-                udUserRepository.create(UserEntity.fromJson(user)),
-                null
-        )
-        );
+    public @NonNull UserJson createUDUserWithRepo(@NonNull UserJson user) {
+        return Objects.requireNonNull(xaTransactionTemplate.execute(() -> UserJson.fromEntity(
+                        udUserRepository.create(UserEntity.fromJson(user)),
+                        null
+                )
+        ));
     }
 
-    public void addIncomeInvitation(UserJson requester, UserJson addressee) {
+    public void addIncomeInvitation(@NonNull UserJson requester, @NonNull UserJson addressee) {
         xaTransactionTemplate.execute(() -> {
             udUserRepository.addIncomeInvitation(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
             return null;
         });
     }
 
-    public void addOutcomeInvitation(UserJson requester, UserJson addressee) {
+    public void addOutcomeInvitation(@NonNull UserJson requester, @NonNull UserJson addressee) {
         xaTransactionTemplate.execute(() -> {
             udUserRepository.addOutcomeInvitation(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
             return null;
         });
     }
 
-    public void addFriend(UserJson requester, UserJson addressee) {
+    public void addFriend(@NonNull UserJson requester, @NonNull UserJson addressee) {
         xaTransactionTemplate.execute(() -> {
             udUserRepository.addFriend(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
             return null;

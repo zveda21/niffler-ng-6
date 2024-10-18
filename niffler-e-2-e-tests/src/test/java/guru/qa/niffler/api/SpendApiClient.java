@@ -4,15 +4,20 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
+import lombok.NonNull;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ParametersAreNonnullByDefault
 public class SpendApiClient {
 
     private final Retrofit retrofit = new Retrofit.Builder()
@@ -22,7 +27,7 @@ public class SpendApiClient {
 
     private final SpendApi spendApi = retrofit.create(SpendApi.class);
 
-    public SpendJson createSpend(SpendJson spend) {
+    public @Nullable SpendJson createSpend(SpendJson spend) {
         final Response<SpendJson> response;
         try {
             response = spendApi.addSpend(spend)
@@ -34,7 +39,7 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public SpendJson editSpend(SpendJson spend) {
+    public @Nullable SpendJson editSpend(SpendJson spend) {
         final Response<SpendJson> response;
         try {
             response = spendApi.editSpend(spend)
@@ -46,7 +51,7 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public SpendJson getSpend(String id, String username) {
+    public @Nullable SpendJson getSpend(String id, String username) {
         final Response<SpendJson> response;
         try {
             response = spendApi.getSpend(id, username)
@@ -58,9 +63,10 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public List<SpendJson> getAllSpends(String username, CurrencyValues filterCurrency,
-                                        String from,
-                                        String to) {
+    public @NonNull List<SpendJson> getAllSpends(String username,
+                                                 @Nullable CurrencyValues filterCurrency,
+                                                 @Nullable String from,
+                                                 @Nullable String to) {
         final Response<List<SpendJson>> response;
         try {
             response = spendApi.getAllSpends(username, filterCurrency, from, to)
@@ -69,7 +75,9 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return response.body() != null
+                ? response.body()
+                : Collections.emptyList();
     }
 
     public void deleteSpend(String username, List<String> ids) {
@@ -83,7 +91,7 @@ public class SpendApiClient {
         assertEquals(202, response.code());
     }
 
-    public CategoryJson createCategory(CategoryJson category) {
+    public @Nullable CategoryJson createCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
             response = spendApi.createCategory(category)
@@ -95,7 +103,7 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public CategoryJson updateCategory(CategoryJson category) {
+    public @Nullable CategoryJson updateCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
             response = spendApi.updateCategory(category)
@@ -108,7 +116,7 @@ public class SpendApiClient {
     }
 
 
-    public List<CategoryJson> getAllCategories(String username, boolean excludeArchived) {
+    public @NonNull List<CategoryJson> getAllCategories(String username, boolean excludeArchived) {
         final Response<List<CategoryJson>> response;
         try {
             response = spendApi.getAllCategories(username, excludeArchived)
@@ -117,6 +125,8 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return response.body() != null
+                ? response.body()
+                : Collections.emptyList();
     }
 }

@@ -6,12 +6,10 @@ import guru.qa.niffler.data.dao.impl.CategoryDaoSpringJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.model.CategoryJson;
+import lombok.NonNull;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 public class CategoryDbClient {
@@ -21,7 +19,7 @@ public class CategoryDbClient {
     private final JdbcTransactionTemplate jdbcTemplate = new JdbcTransactionTemplate(CFG.spendJdbcUrl());
     private final CategoryDao categoryDao = new CategoryDaoSpringJdbc();
 
-    public CategoryJson createCategoryIfNotExist(CategoryJson categoryJson) {
+    public CategoryJson createCategoryIfNotExist(@NonNull CategoryJson categoryJson) {
         return jdbcTemplate.execute(() -> {
                     Optional<CategoryEntity> existingCategory = categoryDao.findCategoryByUsernameAndCategoryName(categoryJson.username(), categoryJson.name());
                     if (existingCategory.isPresent()) {
@@ -35,7 +33,7 @@ public class CategoryDbClient {
 
     }
 
-    public CategoryJson findCategoryById(UUID categoryId) {
+    public CategoryJson findCategoryById(@NonNull UUID categoryId) {
         return jdbcTemplate.execute(() -> {
                     Optional<CategoryEntity> category = categoryDao.findCategoryById(categoryId);
                     return category.map(CategoryJson::fromEntity).orElse(null);
@@ -43,7 +41,7 @@ public class CategoryDbClient {
                 TRANSACTION_ISOLATION_LEVEL);
     }
 
-    public List<CategoryJson> findAllCategoryByUsername(String username) {
+    public List<CategoryJson> findAllCategoryByUsername(@NonNull String username) {
         return jdbcTemplate.execute(() -> {
                     List<CategoryEntity> categoryEntities = categoryDao.findAllByUsername(username);
                     List<CategoryJson> categoryJsons = new ArrayList<>();
@@ -56,7 +54,7 @@ public class CategoryDbClient {
                 TRANSACTION_ISOLATION_LEVEL);
     }
 
-    public Optional<CategoryJson> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
+    public Optional<CategoryJson> findCategoryByUsernameAndCategoryName(@NonNull String username,@NonNull String categoryName) {
         return jdbcTemplate.execute(() -> {
                     Optional<CategoryEntity> categoryEntity = categoryDao.findCategoryByUsernameAndCategoryName(username, categoryName);
                     return Optional.of(CategoryJson.fromEntity(categoryEntity.get()));
@@ -64,10 +62,7 @@ public class CategoryDbClient {
                 TRANSACTION_ISOLATION_LEVEL);
     }
 
-    public void deleteCategory(CategoryJson categoryJson) {
-        if (categoryJson == null) {
-            throw new IllegalArgumentException("CategoryJson cannot be null");
-        }
+    public void deleteCategory(@NonNull CategoryJson categoryJson) {
         jdbcTemplate.execute(() -> {
                     CategoryEntity categoryEntity = CategoryEntity.fromJson(categoryJson);
                     categoryDao.deleteCategory(categoryEntity);
@@ -76,8 +71,8 @@ public class CategoryDbClient {
                 TRANSACTION_ISOLATION_LEVEL);
     }
 
-    public List<CategoryJson> findAllCategories() {
-        return jdbcTemplate.execute(() -> {
+    public @NonNull List<CategoryJson> findAllCategories() {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> {
                     List<CategoryEntity> categoryEntities = categoryDao.findAll();
                     List<CategoryJson> categoryJsonList = new ArrayList<>();
                     for (CategoryEntity categoryEntity : categoryEntities) {
@@ -85,6 +80,6 @@ public class CategoryDbClient {
                     }
                     return categoryJsonList;
                 },
-                TRANSACTION_ISOLATION_LEVEL);
+                TRANSACTION_ISOLATION_LEVEL));
     }
 }
