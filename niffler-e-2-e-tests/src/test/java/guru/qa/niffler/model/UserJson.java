@@ -33,10 +33,10 @@ public record UserJson(
                 entity.getCurrency(),
                 entity.getFirstname(),
                 entity.getFullname(),
-                entity.getUsername(),
-                entity.getSurname(),
                 entity.getPhoto() != null && entity.getPhoto().length > 0 ? new String(entity.getPhoto(), StandardCharsets.UTF_8) : null,
                 entity.getPhotoSmall() != null && entity.getPhotoSmall().length > 0 ? new String(entity.getPhotoSmall(), StandardCharsets.UTF_8) : null,
+                entity.getSurname(),
+                entity.getUsername(),
                 friendState
         );
     }
