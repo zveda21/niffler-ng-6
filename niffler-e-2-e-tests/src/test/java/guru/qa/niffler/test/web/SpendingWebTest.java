@@ -73,7 +73,6 @@ public class SpendingWebTest {
                 .checkTableContains(spendJson.description());
     }
 
-    @SneakyThrows
     @User(
             username = "vates",
             spendings = @Spending(
@@ -95,6 +94,5 @@ public class SpendingWebTest {
         new EditSpendingPage().setCategory("test")
                 .setNewSpendingDescription("new desc")
                 .save();
-        Thread.sleep(4000);
     }
 }
