@@ -12,7 +12,7 @@ import java.sql.Statement;
 import java.util.Optional;
 import java.util.UUID;
 
-import static guru.qa.niffler.data.tpl.Connections.holder;
+import static guru.qa.niffler.data.jdbc.Connections.holder;
 
 public class UdUserDaoJdbc implements UdUserDao {
 
