@@ -3,6 +3,7 @@ package guru.qa.niffler.page;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.config.Config;
+import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -19,6 +20,12 @@ public class FriendsPage {
     private final ElementsCollection friendsList = $$("#friends>tr p:nth-child(1)");
     private final ElementsCollection friendNameInRequestsList = $$("#requests tr td:nth-child(1) p:nth-child(1)");
     private final ElementsCollection allPeopleList = $$("#all tr");
+    private final SelenideElement acceptFriendButton = $("[class^='MuiTableCell-root'] button[class*='MuiButton-containedPrimary']");
+    private final SelenideElement declineFriendButton = $("[class^='MuiTableCell-root'] button[class*='MuiButton-containedSecondary']");
+    private final SelenideElement confirmDeclineFriendButton = $("[class^='MuiDialogActions'] button[class*='MuiButton-containedPrimary']");
+    private final SelenideElement unfriendButton = $("button[class*='MuiButton-containedSecondary']");
+    private final SelenideElement addFriendButton = $("button[class*='MuiButton-containedSecondary']");
+
 
     public FriendsPage clickOnFriendButton() {
         friendsButton.click();
@@ -44,5 +51,30 @@ public class FriendsPage {
 
     public void checkIfOutcomeFriendRequestIsVisibleInAllList(String friendName) {
         allPeopleList.findBy(text(friendName)).shouldBe(visible).shouldHave(text("Waiting..."));
+    }
+
+    @Step("Accept friend request")
+    public FriendsPage clickOnAcceptFriendButton() {
+        acceptFriendButton.click();
+        return this;
+    }
+
+    @Step("Decline friend request")
+    public FriendsPage clickOnDeclineFriendButton() {
+        declineFriendButton.click();
+        confirmDeclineFriendButton.click();
+        return this;
+    }
+
+    @Step("Check if unfriend button is visible")
+    public FriendsPage checkIfUnfriendButtonIsVisible() {
+        unfriendButton.shouldBe(visible);
+        return this;
+    }
+
+    @Step("Click on Add friend button")
+    public FriendsPage clickOnAddFriendButton() {
+        addFriendButton.click();
+        return this;
     }
 }

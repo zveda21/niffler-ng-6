@@ -18,6 +18,8 @@ public class ProfilePage {
     private final SelenideElement showArchivedToggle = $("[class^='MuiFormControlLabel-root']");
     private final ElementsCollection archivedCategoriesList = $$("[class*='clickableColorDefault'] [class^='MuiChip-label']");
     private final ElementsCollection activeCategoriesList = $$("[class*='clickableColorPrimary'] [class^='MuiChip-label']");
+    private final SelenideElement nameInput = $("#name");
+    private final SelenideElement saveChangesButton = $("[class^='MuiGrid-root'] button[class*='containedPrimary']");
 
     public ProfilePage clickOnPersonIcon() {
         personIcon.click();
@@ -40,5 +42,15 @@ public class ProfilePage {
 
     public void checkActiveCategoriesIsVisible(String categoryName) {
         activeCategoriesList.find(text(categoryName)).shouldBe(visible);
+    }
+
+    public ProfilePage setName(String username){
+        nameInput.setValue(username);
+        return this;
+    }
+
+    public ProfilePage clickOnSaveChangesButton() {
+        saveChangesButton.click();
+        return this;
     }
 }
