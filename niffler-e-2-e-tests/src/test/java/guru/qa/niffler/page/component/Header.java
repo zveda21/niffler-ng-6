@@ -28,7 +28,7 @@ public class Header {
 
     @Step("Navigate to PeoplePage")
     public PeoplePage toAllPeoplePage() {
-        navigateTo(PeoplePage.allPeoplePageUrl);
+        navigateTo(PeoplePage.url);
         return new PeoplePage();
     }
 

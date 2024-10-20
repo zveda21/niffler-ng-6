@@ -4,6 +4,6 @@ import guru.qa.niffler.config.Config;
 
 public class PeoplePage {
 
-    public static String allPeoplePageUrl = Config.getInstance().frontUrl() + "people/all";
+    public static String url = Config.getInstance().frontUrl() + "people/all";
 
 }
