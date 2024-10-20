@@ -1,6 +1,7 @@
 package guru.qa.niffler.jupiter.extension;
 
 import com.github.jknack.handlebars.internal.lang3.ArrayUtils;
+import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
@@ -20,7 +21,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(SpendingExtension.class);
 
-    private final SpendClient spendClient = new SpendDbClient();
+    private final SpendApiClient spendApiClient = new SpendApiClient();
 
     @Override
     public void beforeEach(ExtensionContext context) {
@@ -46,7 +47,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                                     user != null ? user.username() : userAnno.username()
                             );
 
-                            SpendJson createdSpend = spendClient.createSpend(spend);
+                            SpendJson createdSpend = spendApiClient.createSpend(spend);
                             result.add(createdSpend);
                         }
                         if (user != null) {
