@@ -17,7 +17,6 @@ public class Calendar {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         String formattedDate = dateFormat.format(date);
 
-        calendarInput.clear();
         calendarInput.setValue(formattedDate);
         calendarInput.pressEnter();
 
