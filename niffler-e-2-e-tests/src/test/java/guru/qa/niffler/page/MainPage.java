@@ -10,7 +10,7 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class MainPage {
 
-    public static String mainPageUrl = Config.getInstance().frontUrl() + "main";
+    public static String url = Config.getInstance().frontUrl() + "main";
 
     private final SelenideElement personIcon = $("[data-testid='PersonIcon']");
     private final SelenideElement friendButton = $("li [href='/people/friends']");

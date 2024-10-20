@@ -46,7 +46,7 @@ public class Header {
 
     @Step("Navigate to MainPage")
     public MainPage toMainPage() {
-        navigateTo(MainPage.mainPageUrl);
+        navigateTo(MainPage.url);
         return new MainPage();
     }
 }
