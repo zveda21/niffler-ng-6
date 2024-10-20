@@ -2,6 +2,7 @@ package guru.qa.niffler.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
+import lombok.NonNull;
 
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ public record AuthUserJson(
         Boolean enabled,
         @JsonProperty("password")
         String password) {
-    public static AuthUserJson fromEntity(AuthUserEntity entity) {
+    public static @NonNull AuthUserJson fromEntity(@NonNull AuthUserEntity entity) {
         return new AuthUserJson(
                 entity.getId(),
                 entity.getUsername(),

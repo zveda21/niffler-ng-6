@@ -21,8 +21,8 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
     public void beforeEach(ExtensionContext context) {
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
                 .ifPresent(anno -> {
-                    if (anno.spending().length > 0) {
-                        Spending spending = anno.spending()[0];
+                    if (anno.spendings().length > 0) {
+                        Spending spending = anno.spendings()[0];
                         SpendJson spend = new SpendJson(
                                 null,
                                 new Date(),

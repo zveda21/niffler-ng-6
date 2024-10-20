@@ -9,12 +9,10 @@ import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.model.SpendJson;
+import lombok.NonNull;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class SpendDbClient {
 
@@ -25,8 +23,9 @@ public class SpendDbClient {
 
     private final JdbcTransactionTemplate jdbcTemplate = new JdbcTransactionTemplate(CFG.spendJdbcUrl());
 
-    public SpendJson createSpend(SpendJson spend) {
-        return jdbcTemplate.execute(() -> {
+
+    public @NonNull SpendJson createSpend(@NonNull SpendJson spend) {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> {
                     SpendEntity spendEntity = SpendEntity.fromJson(spend);
                     if (spendEntity.getCategory().getId() == null) {
                         CategoryEntity categoryEntity = categoryDao.create(spendEntity.getCategory());
@@ -35,11 +34,11 @@ public class SpendDbClient {
                     return SpendJson.fromEntity(spendDao.create(spendEntity));
                 },
                 TRANSACTION_ISOLATION_LEVEL
-        );
+        ));
     }
 
-    public SpendJson createSpendUsingSpringJdbc(SpendJson spendJson) {
-        return jdbcTemplate.execute(() -> {
+    public @NonNull SpendJson createSpendUsingSpringJdbc(@NonNull SpendJson spendJson) {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> {
                     SpendEntity spendEntity = SpendEntity.fromJson(spendJson);
                     if (spendEntity.getCategory().getId() == null) {
                         CategoryEntity categoryEntity = categoryDao.create(spendEntity.getCategory());
@@ -50,11 +49,11 @@ public class SpendDbClient {
                     return SpendJson.fromEntity(createdSpendEntity);
                 }
                 ,
-                TRANSACTION_ISOLATION_LEVEL);
+                TRANSACTION_ISOLATION_LEVEL));
     }
 
-    public List<SpendJson> findAllSpendsSpringJdbc() {
-        return jdbcTemplate.execute(() -> {
+    public @NonNull List<SpendJson> findAllSpendsSpringJdbc() {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> {
                     List<SpendEntity> spendEntities = spendDao.findAll();
                     List<SpendJson> spendJsonList = new ArrayList<>();
                     for (SpendEntity spendEntity : spendEntities) {
@@ -63,19 +62,19 @@ public class SpendDbClient {
                     return spendJsonList;
                 }
                 ,
-                TRANSACTION_ISOLATION_LEVEL);
+                TRANSACTION_ISOLATION_LEVEL));
     }
 
-    public SpendJson findSpendById(UUID spendId) {
-        return jdbcTemplate.execute(() -> {
+    public @NonNull SpendJson findSpendById(@NonNull UUID spendId) {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> {
                     Optional<SpendEntity> optionalSpend = spendDao.findSpendById(spendId);
                     return optionalSpend.map(SpendJson::fromEntity).orElse(null);
                 },
-                TRANSACTION_ISOLATION_LEVEL);
+                TRANSACTION_ISOLATION_LEVEL));
     }
 
-    public List<SpendJson> findAllSpendByUsername(String username) {
-        return jdbcTemplate.execute(() -> {
+    public @NonNull List<SpendJson> findAllSpendByUsername(@NonNull String username) {
+        return Objects.requireNonNull(jdbcTemplate.execute(() -> {
                     List<SpendEntity> spendEntities = spendDao.findAllByUsername(username);
                     List<SpendJson> spendJsonList = new ArrayList<>();
                     for (SpendEntity spendEntity : spendEntities) {
@@ -83,13 +82,10 @@ public class SpendDbClient {
                     }
                     return spendJsonList;
                 },
-                TRANSACTION_ISOLATION_LEVEL);
+                TRANSACTION_ISOLATION_LEVEL));
     }
 
-    public void deleteSpending(SpendJson spend) {
-        if (spend == null) {
-            throw new IllegalArgumentException("SpendJson cannot be null");
-        }
+    public void deleteSpending(@NonNull SpendJson spend) {
         jdbcTemplate.execute(() -> {
                     SpendEntity spendEntity = SpendEntity.fromJson(spend);
                     spendDao.deleteSpend(spendEntity);
