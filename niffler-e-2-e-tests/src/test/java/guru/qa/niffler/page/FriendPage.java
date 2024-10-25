@@ -53,13 +53,8 @@ public class FriendPage {
         searchInput.sendKeys(Keys.RETURN);
     }
 
-    public boolean isUserVisible(String username) {
-        for (SelenideElement row : allPeopleNameList) {
-            if (row.getText().contains(username)) {
-                return true;
-            }
-        }
-        return false;
+    public void isUserVisible(String username) {
+        allPeopleNameList.findBy(text(username)).shouldBe(visible);
     }
 
     public void sendFriendRequest(String username) {
