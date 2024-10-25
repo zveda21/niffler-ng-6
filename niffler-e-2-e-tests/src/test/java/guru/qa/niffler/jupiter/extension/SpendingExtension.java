@@ -1,5 +1,6 @@
 package guru.qa.niffler.jupiter.extension;
 
+import guru.qa.niffler.service.impl.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
@@ -7,7 +8,7 @@ import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendClient;
-import guru.qa.niffler.service.SpendDbClient;
+import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
@@ -19,17 +20,17 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(SpendingExtension.class);
 
-    private final SpendApiClient spendApiClient = new SpendApiClient();
+    private final SpendClient spendApiClient = new SpendApiClient();
 
     @Override
     public void beforeEach(ExtensionContext context) {
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
                 .ifPresent(userAnno -> {
-                    if (ArrayUtils.isNotEmpty(userAnno.spending())) {
+                    if (ArrayUtils.isNotEmpty(userAnno.spendings())) {
                         List<SpendJson> result = new ArrayList<>();
                         UserJson user = context.getStore(UserExtension.NAMESPACE)
                                 .get(context.getUniqueId(), UserJson.class);
-                        for (Spending spendAnno : userAnno.spending()) {
+                        for (Spending spendAnno : userAnno.spendings()) {
                             SpendJson spend = new SpendJson(
                                     null,
                                     new Date(),
@@ -49,7 +50,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                             result.add(createdSpend);
                         }
                         if (user != null) {
-                            user.testData().spendings().addAll(result);
+                            user.testData().spends().addAll(result);
                         } else {
                             context.getStore(NAMESPACE).put(
                                     context.getUniqueId(),

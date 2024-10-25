@@ -11,7 +11,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
-public class FriendsPage {
+public class FriendsPage extends BasePage<FriendsPage>{
 
     public static String friendsPageUrl = Config.getInstance().frontUrl() + "people/friends";
 

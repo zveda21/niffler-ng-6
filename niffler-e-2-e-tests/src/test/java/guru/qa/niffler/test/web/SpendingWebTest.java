@@ -11,7 +11,6 @@ import guru.qa.niffler.page.EditSpendingPage;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.component.SpendingTable;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 @WebTest
@@ -76,8 +75,8 @@ public class SpendingWebTest {
     @User(
             username = "vates",
             spendings = @Spending(
-                    category = "13",
-                    description = "Test2",
+                    category = "test2",
+                    description = "Test3",
                     amount = 2345
             )
     )
@@ -93,6 +92,7 @@ public class SpendingWebTest {
                 .clickOnEditSpending(spendJson.description());
         new EditSpendingPage().setCategory("test")
                 .setNewSpendingDescription("new desc")
-                .save();
+                .save()
+                .checkAlertMessage("Spending is edited successfully");
     }
 }

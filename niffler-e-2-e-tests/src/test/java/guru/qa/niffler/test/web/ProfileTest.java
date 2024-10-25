@@ -7,7 +7,6 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.page.LoginPage;
-import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.ProfilePage;
 import guru.qa.niffler.page.component.Header;
 import lombok.SneakyThrows;
@@ -55,10 +54,10 @@ public class ProfileTest {
     @Test
     public void checkProfileUpdateFunctionality() {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login("zveda", "12345");
+                .login("vates", "12345");
         new Header().toProfilePage();
         new ProfilePage().setName(randomUsername())
-                .clickOnSaveChangesButton();
-        Thread.sleep(3000);
+                .clickOnSaveChangesButton()
+                .checkAlertMessage("Profile successfully updated");
     }
 }

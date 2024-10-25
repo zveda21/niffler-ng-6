@@ -10,8 +10,7 @@ import guru.qa.niffler.page.FriendsPage;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.component.SearchField;
-import guru.qa.niffler.service.UserDbClient;
-import lombok.SneakyThrows;
+import guru.qa.niffler.service.impl.UserDbClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -88,6 +87,7 @@ public class FriendWebTest {
                         null,
                         null,
                         username,
+                        null,
                         null
                 )
         );
@@ -101,6 +101,7 @@ public class FriendWebTest {
                         null,
                         null,
                         username2,
+                        null,
                         null
                 )
         );
@@ -129,7 +130,7 @@ public class FriendWebTest {
                         null,
                         null,
                         username,
-                        null
+                        null,null
                 )
         );
         UserJson newUser2 = usersDbClient.createUserWithRepo(
@@ -142,6 +143,7 @@ public class FriendWebTest {
                         null,
                         null,
                         username2,
+                        null,
                         null
                 )
         );
@@ -168,6 +170,7 @@ public class FriendWebTest {
                         null,
                         null,
                         username,
+                        null,
                         null
                 )
         );
@@ -181,6 +184,7 @@ public class FriendWebTest {
                         null,
                         null,
                         username2,
+                        null,
                         null
                 )
         );
