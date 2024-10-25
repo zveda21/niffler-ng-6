@@ -18,5 +18,5 @@ public @interface User {
 
     Category[] categories() default {};
 
-    Spending[] spending() default {};
+    Spending[] spendings() default {};
 }

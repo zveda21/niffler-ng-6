@@ -6,6 +6,7 @@ import guru.qa.niffler.data.dao.impl.AuthUserDaoJdbc;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.model.AuthUserJson;
+import lombok.NonNull;
 
 import java.sql.Connection;
 
@@ -17,7 +18,8 @@ public class AuthUserDbClient {
     private final JdbcTransactionTemplate jdbcTemplate = new JdbcTransactionTemplate(CFG.authJdbcUrl());
     private final AuthUserDao authUserDao = new AuthUserDaoJdbc();
 
-    public AuthUserJson createAuthUser(AuthUserJson authUserJson) {
+
+    public AuthUserJson createAuthUser(@NonNull AuthUserJson authUserJson) {
         return jdbcTemplate.execute(() -> {
                     AuthUserEntity authUserEntity = AuthUserEntity.fromJson(authUserJson);
                     return AuthUserJson.fromEntity(authUserDao.createUser(authUserEntity));
