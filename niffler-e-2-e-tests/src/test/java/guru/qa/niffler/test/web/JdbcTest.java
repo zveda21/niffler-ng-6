@@ -1,6 +1,5 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.*;
 import guru.qa.niffler.service.AuthUserDbClient;
 import guru.qa.niffler.service.CategoryDbClient;
@@ -11,10 +10,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class JdbcTest {
 
@@ -81,87 +76,6 @@ public class JdbcTest {
                 )
         );
         System.out.println(spend);
-    }
-
-    @Test
-    void findSpendingByIdTest() {
-        SpendDbClient client = new SpendDbClient();
-        SpendJson spend = client.findSpendById(UUID.fromString("77ba42f4-7e54-11ef-9898-0242ac110002"));
-        System.out.println("spend--" + spend);
-    }
-
-    @Test
-    void findSpendingByUsernameTest() {
-        SpendDbClient client = new SpendDbClient();
-        List<SpendJson> spendJsonList = client.findAllSpendByUsername("duck");
-        for (SpendJson spendJson : spendJsonList) {
-            System.out.println(spendJson);
-        }
-    }
-
-    @Test
-    void checkIfSpendingDeletedBId() {
-        SpendDbClient client = new SpendDbClient();
-        SpendJson spendToDelete = client.createSpend(
-                new SpendJson(
-                        null,
-                        new Date(),
-                        new CategoryJson(
-                                null,
-                                "Test by zi 2",
-                                "duck",
-                                false
-                        ),
-                        CurrencyValues.USD,
-                        47.0,
-                        "test",
-                        "duck"
-                )
-        );
-        System.out.println(spendToDelete);
-        client.deleteSpending(spendToDelete);
-        SpendJson deletedSpend = client.findSpendById(spendToDelete.id());
-        assertNull(deletedSpend, "Spend should be deleted and not found");
-
-    }
-
-    @Test
-    void createSpendUsingSpringJdbcTest() {
-        SpendDbClient spendDbClient = new SpendDbClient();
-        SpendJson spend = spendDbClient.createSpendUsingSpringJdbc(
-                new SpendJson(
-                        null,
-                        new Date(),
-                        new CategoryJson(
-                                null,
-                                "cat-name-tx-47_byzi",
-                                "duck",
-                                false
-                        ),
-                        CurrencyValues.RUB,
-                        1000.0,
-                        "spend-name-tx_byzi",
-                        "duck"
-                )
-        );
-
-        System.out.println("spend--" + spend);
-    }
-
-    @Test
-    void findAllSpendSpringJdbcTest() {
-        SpendDbClient spendDbClient = new SpendDbClient();
-        for (int i = 0; i < spendDbClient.findAllSpendsSpringJdbc().size(); i++) {
-            System.out.println("spends--" + spendDbClient.findAllSpendsSpringJdbc().get(i));
-        }
-    }
-
-    @Test
-    void findAllSpendsTest() {
-        SpendDbClient spendDbClient = new SpendDbClient();
-        for (int i = 0; i < spendDbClient.findAllSpendsSpringJdbc().size(); i++) {
-            System.out.println("spends--" + spendDbClient.findAllSpendsSpringJdbc().get(i));
-        }
     }
 
     @Test

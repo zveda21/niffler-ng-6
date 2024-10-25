@@ -4,6 +4,7 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.config.Config;
 import io.qameta.allure.Step;
+import org.openqa.selenium.Keys;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -20,6 +21,9 @@ public class FriendsPage {
     private final ElementsCollection friendsList = $$("#friends>tr p:nth-child(1)");
     private final ElementsCollection friendNameInRequestsList = $$("#requests tr td:nth-child(1) p:nth-child(1)");
     private final ElementsCollection allPeopleList = $$("#all tr");
+    private final SelenideElement searchInput = $("[class^='MuiToolbar-root'] input");
+    private final ElementsCollection allPeopleNameList = $$("#all>tr p:nth-child(1)");
+    private final ElementsCollection allAddFriendButtonList = $$("#all>tr button");
     private final SelenideElement acceptFriendButton = $("[class^='MuiTableCell-root'] button[class*='MuiButton-containedPrimary']");
     private final SelenideElement declineFriendButton = $("[class^='MuiTableCell-root'] button[class*='MuiButton-containedSecondary']");
     private final SelenideElement confirmDeclineFriendButton = $("[class^='MuiDialogActions'] button[class*='MuiButton-containedPrimary']");
@@ -51,6 +55,20 @@ public class FriendsPage {
 
     public void checkIfOutcomeFriendRequestIsVisibleInAllList(String friendName) {
         allPeopleList.findBy(text(friendName)).shouldBe(visible).shouldHave(text("Waiting..."));
+    }
+
+    public void searchUserByName(String username) {
+        searchInput.clear();
+        searchInput.sendKeys(username);
+        searchInput.sendKeys(Keys.RETURN);
+    }
+
+    public void isUserVisible(String username) {
+        allPeopleNameList.findBy(text(username)).shouldBe(visible);
+    }
+
+    public void sendFriendRequest(String username) {
+//todo
     }
 
     @Step("Accept friend request")
