@@ -17,7 +17,4 @@ public interface UserApi {
     @POST("/internal/invitations/outcome")
     Call<Void> acceptInvitation(@Body String receiverUsername);
 
-    default void deleteUser(int id) {
-        throw new UnsupportedOperationException("User deletion is not supported.");
-    }
 }
