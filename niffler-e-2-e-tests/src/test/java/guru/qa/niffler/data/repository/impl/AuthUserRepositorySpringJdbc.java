@@ -2,15 +2,14 @@ package guru.qa.niffler.data.repository.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
-import guru.qa.niffler.data.mapper.extractor.AuthUserResultSetExtractor;
+import guru.qa.niffler.data.extractor.AuthUserEntityExtractor;
 import guru.qa.niffler.data.repository.AuthUserRepository;
-import guru.qa.niffler.data.tpl.DataSources;
+import guru.qa.niffler.data.jdbc.DataSources;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.PreparedStatement;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -89,13 +88,9 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
                 "JOIN authority a ON u.id = a.user_id " +
                 "WHERE u.id = ?";
 
-        Map<UUID, AuthUserEntity> userMap = jdbcTemplate.query(
-                sql,
-                new AuthUserResultSetExtractor(),
-                id
-        );
+        AuthUserEntity user = jdbcTemplate.query(sql, AuthUserEntityExtractor.instance, id);
 
-        return Optional.ofNullable(userMap.get(id));
+        return Optional.ofNullable(user);
     }
 
     @Override
@@ -105,12 +100,10 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
                 "FROM \"user\" u " +
                 "JOIN authority a ON u.id = a.user_id " +
                 "WHERE u.username = ?";
-        Map<UUID, AuthUserEntity> userMap = jdbcTemplate.query(
-                sql,
-                new AuthUserResultSetExtractor(),
-                username
-        );
-        return userMap.values().stream().findFirst();
+
+        AuthUserEntity user = jdbcTemplate.query(sql, AuthUserEntityExtractor.instance, username);
+
+        return Optional.ofNullable(user);
     }
 
     @Override

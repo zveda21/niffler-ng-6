@@ -3,17 +3,16 @@ package guru.qa.niffler.data.repository.impl;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
-import guru.qa.niffler.data.mapper.extractor.AuthUserResultSetExtractor;
+import guru.qa.niffler.data.extractor.AuthUserEntityExtractor;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static guru.qa.niffler.data.tpl.Connections.holder;
+import static guru.qa.niffler.data.jdbc.Connections.holder;
 
 public class AuthUserRepositoryJdbc implements AuthUserRepository {
 
@@ -91,15 +90,17 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
 
     @Override
     public Optional<AuthUserEntity> findById(UUID id) {
-        try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
-                "SELECT a.id AS authority_id, a.authority,u.id AS id, u.username,u.password,u.enabled, " +
-                        "u.account_non_expired,u.account_non_locked,u.credentials_non_expired FROM \"user\" u " +
-                        "JOIN authority a ON u.id = a.user_id WHERE u.id = ?")) {
+        String sql = "SELECT a.id AS authority_id, a.authority, u.id AS id, u.username, u.password, " +
+                "u.enabled, u.account_non_expired, u.account_non_locked, u.credentials_non_expired " +
+                "FROM \"user\" u " +
+                "JOIN authority a ON u.id = a.user_id WHERE u.id = ?";
+        try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(sql)) {
             ps.setObject(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
-                Map<UUID, AuthUserEntity> userMap = new AuthUserResultSetExtractor().extractData(rs);
-                return Optional.ofNullable(userMap.get(id));
+                // Use the extractor to get the user
+                AuthUserEntity user = AuthUserEntityExtractor.instance.extractData(rs);
+                return Optional.ofNullable(user);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -115,9 +116,10 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
                 "WHERE u.username = ?";
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(sql)) {
             ps.setString(1, username);
+
             try (ResultSet rs = ps.executeQuery()) {
-                Map<UUID, AuthUserEntity> userMap = new AuthUserResultSetExtractor().extractData(rs);
-                return userMap.values().stream().findFirst();
+                AuthUserEntity user =  AuthUserEntityExtractor.instance.extractData(rs);
+                return Optional.ofNullable(user);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
