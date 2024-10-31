@@ -40,7 +40,7 @@ public class LoginWebTest {
                     @Category(name = "cat_4", archived = false),
                     @Category(name = "cat_2", archived = true),
             },
-            spending = {
+            spendings = {
                     @Spending(
                             category = "cat_3",
                             description = "test_spend",

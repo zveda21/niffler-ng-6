@@ -8,13 +8,17 @@ import io.qameta.allure.Step;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
-public class SpendingTable {
+public class SpendingTable extends BaseComponent<SpendingTable>{
 
     private final SelenideElement periodButton = $("#period");
     private final SelenideElement periodList = $("ul[class^='MuiList-root']");
     private final SelenideElement spendList = $("tbody[class^='MuiTableBody-root']");
     private final SelenideElement deleteSpendButton = $("#delete");
     private SearchField searchField = new SearchField();
+
+    public SpendingTable() {
+        super($("#spendings"));
+    }
 
     @Step("Select a period")
     public SpendingTable selectPeriod(String period) {

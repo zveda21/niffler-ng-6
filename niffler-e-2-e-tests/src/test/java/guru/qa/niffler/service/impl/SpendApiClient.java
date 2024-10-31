@@ -1,13 +1,14 @@
-package guru.qa.niffler.api;
+package guru.qa.niffler.service.impl;
 
+import guru.qa.niffler.api.SpendApi;
+import guru.qa.niffler.api.core.RestClient;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.service.SpendClient;
 import lombok.NonNull;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -18,14 +19,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ParametersAreNonnullByDefault
-public class SpendApiClient {
+public class SpendApiClient implements SpendClient {
 
-    private final Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(Config.getInstance().spendUrl())
-            .addConverterFactory(JacksonConverterFactory.create())
-            .build();
-
-    private final SpendApi spendApi = retrofit.create(SpendApi.class);
+    private static final Config CFG = Config.getInstance();
+    private final SpendApi spendApi = new RestClient.EmptyClient(CFG.spendUrl()).create(SpendApi.class);
 
     public @Nullable SpendJson createSpend(SpendJson spend) {
         final Response<SpendJson> response;
@@ -128,5 +125,10 @@ public class SpendApiClient {
         return response.body() != null
                 ? response.body()
                 : Collections.emptyList();
+    }
+
+    @Override
+    public void removeCategory(CategoryJson category) {
+        throw new UnsupportedOperationException("Can`t remove category using API");
     }
 }

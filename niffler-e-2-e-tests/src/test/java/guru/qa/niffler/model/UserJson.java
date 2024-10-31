@@ -30,7 +30,7 @@ public record UserJson(
         @JsonProperty("friendState")
         FriendState friendState,
         @JsonIgnore
-        TestData testData) {
+        guru.qa.niffler.model.TestData testData) {
     public static UserJson fromEntity(UserEntity entity, FriendState friendState) {
         return new UserJson(
                 entity.getId(),
@@ -46,7 +46,7 @@ public record UserJson(
         );
     }
 
-    public UserJson addTestData(TestData testData) {
+    public UserJson addTestData(guru.qa.niffler.model.TestData testData) {
         return new UserJson(
                 id, currency, firstname, fullname, photo, photoSmall, surname, username, friendState, testData
         );

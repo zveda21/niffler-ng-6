@@ -10,11 +10,14 @@ public interface UserApi {
     Call<UserJson> getCurrentUser(@Query("username") String username);
 
     // sendInvitation
-    @POST("/internal/invitations/send")
-    Call<Void> sendInvitation(@Body String addresseeUsername);
+    @POST("internal/invitations/send")
+    Call<UserJson> sendInvitation(@Query("username") String username,
+                                  @Query("targetUsername") String targetUsername);
+
 
     // acceptInvitation
     @POST("/internal/invitations/outcome")
-    Call<Void> acceptInvitation(@Body String receiverUsername);
+    Call<Void> acceptInvitation(@Body String receiverUsername,
+                                @Query("targetUsername") String targetUsername);
 
 }

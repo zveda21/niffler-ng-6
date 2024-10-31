@@ -8,9 +8,13 @@ import java.util.Date;
 
 import static com.codeborne.selenide.Selenide.$;
 
-public class Calendar {
+public class Calendar extends BaseComponent<Calendar>{
 
     private final SelenideElement calendarInput = $("input[name='date']");
+
+    public Calendar(SelenideElement self) {
+        super(self);
+    }
 
     @Step("Select date in calendar")
     public Calendar selectDateInCalendar(Date date) {

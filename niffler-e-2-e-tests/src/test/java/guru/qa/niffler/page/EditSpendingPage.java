@@ -5,7 +5,7 @@ import guru.qa.niffler.config.Config;
 
 import static com.codeborne.selenide.Selenide.$;
 
-public class EditSpendingPage {
+public class EditSpendingPage extends BasePage<EditSpendingPage>{
 
     public static String spendingPageUrl = Config.getInstance().frontUrl() + "spending";
 
@@ -25,7 +25,8 @@ public class EditSpendingPage {
         return this;
     }
 
-    public void save() {
+    public EditSpendingPage save() {
         saveBtn.click();
+        return this;
     }
 }

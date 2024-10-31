@@ -8,8 +8,16 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 
-public class Header {
+public class Header extends BaseComponent<Header> {
     private final SelenideElement self = $("#root header ");
+
+    public Header(SelenideElement self) {
+        super(self);
+    }
+
+    public Header(){
+        super($("#root header "));
+    }
 
     @Step("Check header title")
     public void checkHeaderTitle() {
