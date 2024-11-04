@@ -5,17 +5,14 @@ import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.model.allure.ScreenDif;
 import io.qameta.allure.Allure;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
+import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
@@ -40,6 +37,13 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
 
   @Override
   public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
+    ScreenShotTest screenShotTest = context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class);
+    if (screenShotTest.rewriteExpected()) {
+      BufferedImage actual = getActual();
+      if (actual != null) {
+        ImageIO.write(actual, "png", new File("src/test/resources/" + screenShotTest.value()));
+      }
+    }
     ScreenDif screenDif = new ScreenDif(
         "data:image/png;base64," + encoder.encodeToString(imageToBytes(getExpected())),
         "data:image/png;base64," + encoder.encodeToString(imageToBytes(getActual())),
