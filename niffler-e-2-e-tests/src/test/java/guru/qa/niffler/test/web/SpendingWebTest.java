@@ -110,6 +110,7 @@ public class SpendingWebTest {
         .checkTableSize(0);
   }
 
+
   @User(
           spendings = @Spending(
                   category = "Обучение",
@@ -127,3 +128,4 @@ public class SpendingWebTest {
   }
 
 }
+
