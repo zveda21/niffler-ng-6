@@ -30,7 +30,7 @@ public class UsersApiClient implements UsersClient {
 
   @NotNull
   @Override
-  @Step("Create user using API")
+  @Step("Craete user using API")
   public UserJson createUser(String username, String password) {
     try {
       authApi.requestRegisterForm().execute();
