@@ -12,8 +12,11 @@ import io.qameta.allure.Step;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
+import java.util.List;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 import static java.util.Objects.requireNonNull;
@@ -35,18 +38,20 @@ public class UsersApiClient implements UsersClient {
     try {
       authApi.requestRegisterForm().execute();
       authApi.register(
-          username,
-          password,
-          password,
-          ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
+              username,
+              password,
+              password,
+              ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
       ).execute();
+      Thread.sleep(500);
       UserJson createdUser = requireNonNull(userdataApi.currentUser(username).execute().body());
+      System.out.println("Созданный через API user " + createdUser.username());
       return createdUser.addTestData(
-          new TestData(
-              password
-          )
+              new TestData(
+                      password
+              )
       );
-    } catch (IOException e) {
+    } catch (IOException | InterruptedException e) {
       throw new RuntimeException(e);
     }
   }
@@ -60,19 +65,19 @@ public class UsersApiClient implements UsersClient {
         final UserJson newUser;
         try {
           newUser = createUser(username, defaultPassword);
-
+          Thread.sleep(500);
           response = userdataApi.sendInvitation(
-              newUser.username(),
-              targetUser.username()
+                  newUser.username(),
+                  targetUser.username()
           ).execute();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
           throw new AssertionError(e);
         }
         assertEquals(200, response.code());
 
         targetUser.testData()
-            .incomeInvitations()
-            .add(newUser);
+                .incomeInvitations()
+                .add(newUser);
       }
     }
   }
@@ -86,19 +91,19 @@ public class UsersApiClient implements UsersClient {
         final UserJson newUser;
         try {
           newUser = createUser(username, defaultPassword);
-
+          Thread.sleep(500);
           response = userdataApi.sendInvitation(
-              targetUser.username(),
-              newUser.username()
+                  targetUser.username(),
+                  newUser.username()
           ).execute();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
           throw new RuntimeException(e);
         }
         assertEquals(200, response.code());
 
         targetUser.testData()
-            .outcomeInvitations()
-            .add(newUser);
+                .outcomeInvitations()
+                .add(newUser);
       }
     }
   }
@@ -111,22 +116,37 @@ public class UsersApiClient implements UsersClient {
         final Response<UserJson> response;
         try {
           userdataApi.sendInvitation(
-              createUser(
-                  username,
-                  defaultPassword
-              ).username(),
-              targetUser.username()
+                  createUser(
+                          username,
+                          defaultPassword
+                  ).username(),
+                  targetUser.username()
           ).execute();
+          Thread.sleep(500);
           response = userdataApi.acceptInvitation(targetUser.username(), username).execute();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
           throw new RuntimeException(e);
         }
         assertEquals(200, response.code());
 
         targetUser.testData()
-            .friends()
-            .add(response.body());
+                .friends()
+                .add(response.body());
       }
+    }
+  }
+
+  @Nonnull
+  public List<UserJson> getAllUsers(@NotNull String username, @Nullable String searchQuery) {
+    try {
+      Response<List<UserJson>> response = userdataApi.allUsers(username, searchQuery).execute();
+      if (response.isSuccessful() && response.body() != null) {
+        return response.body();
+      } else {
+        throw new IllegalStateException("Unexpected response code: " + response.code());
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to fetch users", e);
     }
   }
 }
