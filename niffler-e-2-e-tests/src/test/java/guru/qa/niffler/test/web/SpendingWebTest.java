@@ -1,7 +1,9 @@
 package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.condition.Bubble;
 import guru.qa.niffler.condition.Color;
+import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
@@ -24,26 +26,26 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class SpendingWebTest {
 
   @User(
-      spendings = @Spending(
-          category = "Обучение",
-          description = "Обучение Advanced 2.0",
-          amount = 79990
-      )
+          spendings = @Spending(
+                  category = "Обучение",
+                  description = "Обучение Advanced 2.0",
+                  amount = 79990
+          )
   )
   @Test
   void categoryDescriptionShouldBeChangedFromTable(UserJson user) {
     final String newDescription = "Обучение Niffler Next Generation";
 
     Selenide.open(LoginPage.URL, LoginPage.class)
-        .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
-        .getSpendingTable()
-        .editSpending("Обучение Advanced 2.0")
-        .setNewSpendingDescription(newDescription)
-        .saveSpending();
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getSpendingTable()
+            .editSpending("Обучение Advanced 2.0")
+            .setNewSpendingDescription(newDescription)
+            .saveSpending();
 
     new MainPage().getSpendingTable()
-        .checkTableContains(newDescription);
+            .checkTableContains(newDescription);
   }
 
   @User
@@ -55,88 +57,170 @@ public class SpendingWebTest {
     String description = RandomDataUtils.randomSentence(3);
 
     Selenide.open(LoginPage.URL, LoginPage.class)
-        .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
-        .getHeader()
-        .addSpendingPage()
-        .setNewSpendingCategory(category)
-        .setNewSpendingAmount(amount)
-        .setNewSpendingDate(currentDate)
-        .setNewSpendingDescription(description)
-        .saveSpending()
-        .checkAlertMessage("New spending is successfully created");
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getHeader()
+            .addSpendingPage()
+            .setNewSpendingCategory(category)
+            .setNewSpendingAmount(amount)
+            .setNewSpendingDate(currentDate)
+            .setNewSpendingDescription(description)
+            .saveSpending()
+            .checkAlertMessage("New spending is successfully created");
 
     new MainPage().getSpendingTable()
-        .checkTableContains(description);
+            .checkTableContains(description);
   }
 
   @User
   @Test
   void shouldNotAddSpendingWithEmptyCategory(UserJson user) {
     Selenide.open(LoginPage.URL, LoginPage.class)
-        .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
-        .getHeader()
-        .addSpendingPage()
-        .setNewSpendingAmount(100)
-        .setNewSpendingDate(new Date())
-        .saveSpending()
-        .checkFormErrorMessage("Please choose category");
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getHeader()
+            .addSpendingPage()
+            .setNewSpendingAmount(100)
+            .setNewSpendingDate(new Date())
+            .saveSpending()
+            .checkFormErrorMessage("Please choose category");
   }
 
   @User
   @Test
   void shouldNotAddSpendingWithEmptyAmount(UserJson user) {
     Selenide.open(LoginPage.URL, LoginPage.class)
-        .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
-        .getHeader()
-        .addSpendingPage()
-        .setNewSpendingCategory("Friends")
-        .setNewSpendingDate(new Date())
-        .saveSpending()
-        .checkFormErrorMessage("Amount has to be not less then 0.01");
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getHeader()
+            .addSpendingPage()
+            .setNewSpendingCategory("Friends")
+            .setNewSpendingDate(new Date())
+            .saveSpending()
+            .checkFormErrorMessage("Amount has to be not less then 0.01");
   }
 
   @User(
-      spendings = @Spending(
-          category = "Обучение",
-          description = "Обучение Advanced 2.0",
-          amount = 79990
-      )
+          spendings = @Spending(
+                  category = "Обучение",
+                  description = "Обучение Advanced 2.0",
+                  amount = 79990
+          )
   )
   @Test
   void deleteSpendingTest(UserJson user) {
     Selenide.open(LoginPage.URL, LoginPage.class)
-        .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
-        .getSpendingTable()
-        .deleteSpending("Обучение Advanced 2.0")
-        .checkTableSize(0);
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getSpendingTable()
+            .deleteSpending("Обучение Advanced 2.0")
+            .checkTableSize(0);
   }
 
   @User(
-      spendings = @Spending(
-          category = "Обучение",
-          description = "Обучение Advanced 2.0",
-          amount = 79990
-      )
+          spendings = @Spending(
+                  category = "Обучение",
+                  description = "Обучение Advanced 2.0",
+                  amount = 79990
+          )
   )
   @ScreenShotTest("img/expected-stat.png")
   void checkStatComponentTest(UserJson user, BufferedImage expected) throws IOException, InterruptedException {
     StatComponent statComponent = Selenide.open(LoginPage.URL, LoginPage.class)
-        .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
-        .getStatComponent();
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getStatComponent();
 
     Thread.sleep(3000);
 
     assertFalse(new ScreenDiffResult(
-        expected,
-        statComponent.chartScreenshot()
+            expected,
+            statComponent.chartScreenshot()
     ), "Screen comparison failure");
 
     statComponent.checkBubbles(Color.yellow);
   }
-}
 
+  @User(
+          spendings = @Spending(
+                  category = "Home",
+                  description = "Test",
+                  amount = 87000
+          )
+  )
+  @Test
+  void checkStatComponents(UserJson user) throws InterruptedException {
+    StatComponent statComponent = Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getStatComponent();
+
+    Thread.sleep(3000);
+
+    statComponent.checkBubblesInCorrectOrder(new Bubble(
+            Color.yellow,
+            "Home 87000 ₽"
+    ));
+  }
+
+  @User(
+          categories = {
+                  @Category(name = "Shopping"),
+                  @Category(name = "Home")
+          },
+          spendings = {
+                  @Spending(
+                          category = "Shopping",
+                          description = "Test",
+                          amount = 2000
+                  ),
+                  @Spending(
+                          category = "Home",
+                          description = "Test",
+                          amount = 150
+                  )
+          }
+  )
+  @Test
+  void checkStatBubblesInAnyOrder(UserJson user) throws InterruptedException {
+    StatComponent statComponent = Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getStatComponent();
+    Thread.sleep(3000);
+    Bubble bubble1 = new Bubble(Color.yellow, "Shopping 2000 ₽");
+    Bubble bubble2 = new Bubble(Color.green, "Home 150 ₽");
+    statComponent.checkBubblesInAnyOrder(bubble2, bubble1);
+
+  }
+
+  @User(
+          spendings = {
+                  @Spending(
+                          category = "Home",
+                          description = "Test",
+                          amount = 67000
+                  ),
+                  @Spending(
+                          category = "Shopping",
+                          description = "Test",
+                          amount = 340
+                  ),
+          }
+  )
+  @Test
+  void checkStatComponentsContains(UserJson user) throws InterruptedException {
+    StatComponent statComponent = Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getStatComponent();
+
+    Thread.sleep(3000);
+
+    Bubble bubble_1 = new Bubble(
+            Color.green,
+            "Shopping 340 ₽"
+    );
+    statComponent.checkBubblesContains(bubble_1);
+  }
+}
