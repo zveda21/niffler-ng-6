@@ -47,7 +47,7 @@ public class UsersDbClient implements UsersClient {
 
   @Nonnull
   @Override
-  @Step("Create user using SQL")
+  @Step("Crete user using SQL")
   public UserJson createUser(String username, String password) {
     return requireNonNull(
         xaTransactionTemplate.execute(
