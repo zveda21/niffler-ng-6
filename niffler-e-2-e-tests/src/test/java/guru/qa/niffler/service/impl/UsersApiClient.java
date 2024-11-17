@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
@@ -33,7 +34,7 @@ public class UsersApiClient implements UsersClient {
 
   @NotNull
   @Override
-  @Step("Crete user using API")
+  @Step("Create user using API")
   public UserJson createUser(String username, String password) {
     try {
       authApi.requestRegisterForm().execute();
@@ -43,15 +44,13 @@ public class UsersApiClient implements UsersClient {
               password,
               ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
       ).execute();
-      Thread.sleep(500);
       UserJson createdUser = requireNonNull(userdataApi.currentUser(username).execute().body());
-      System.out.println("Созданный через API user " + createdUser.username());
       return createdUser.addTestData(
               new TestData(
                       password
               )
       );
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -65,12 +64,12 @@ public class UsersApiClient implements UsersClient {
         final UserJson newUser;
         try {
           newUser = createUser(username, defaultPassword);
-          Thread.sleep(500);
+
           response = userdataApi.sendInvitation(
                   newUser.username(),
                   targetUser.username()
           ).execute();
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
           throw new AssertionError(e);
         }
         assertEquals(200, response.code());
@@ -91,12 +90,12 @@ public class UsersApiClient implements UsersClient {
         final UserJson newUser;
         try {
           newUser = createUser(username, defaultPassword);
-          Thread.sleep(500);
+
           response = userdataApi.sendInvitation(
                   targetUser.username(),
                   newUser.username()
           ).execute();
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
           throw new RuntimeException(e);
         }
         assertEquals(200, response.code());
@@ -122,9 +121,8 @@ public class UsersApiClient implements UsersClient {
                   ).username(),
                   targetUser.username()
           ).execute();
-          Thread.sleep(500);
           response = userdataApi.acceptInvitation(targetUser.username(), username).execute();
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
           throw new RuntimeException(e);
         }
         assertEquals(200, response.code());
@@ -137,16 +135,17 @@ public class UsersApiClient implements UsersClient {
   }
 
   @Nonnull
-  public List<UserJson> getAllUsers(@NotNull String username, @Nullable String searchQuery) {
+  public List<UserJson> allUsers(@Nonnull String username, @Nullable String searchQuery) {
+    final Response<List<UserJson>> response;
     try {
-      Response<List<UserJson>> response = userdataApi.allUsers(username, searchQuery).execute();
-      if (response.isSuccessful() && response.body() != null) {
-        return response.body();
-      } else {
-        throw new IllegalStateException("Unexpected response code: " + response.code());
-      }
+      response = userdataApi.allUsers(username, searchQuery)
+              .execute();
     } catch (IOException e) {
-      throw new RuntimeException("Failed to fetch users", e);
+      throw new AssertionError(e);
     }
+    assertEquals(200, response.code());
+    return response.body() != null
+            ? response.body()
+            : Collections.emptyList();
   }
 }

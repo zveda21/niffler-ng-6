@@ -17,7 +17,7 @@ public class EmptyUsersTest {
     @User
     void checkIfUsersListIsEmptyTest(UserJson user){
         UsersApiClient usersApiClient = new UsersApiClient();
-        List<UserJson> response = usersApiClient.getAllUsers(user.username(),null);
+        List<UserJson> response = usersApiClient.allUsers(user.username(),null);
         assertTrue(response.isEmpty(),"The user list must be empty.");
     }
 }
