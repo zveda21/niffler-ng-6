@@ -1,6 +1,7 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.page.component.Header;
 import guru.qa.niffler.page.component.SpendingTable;
@@ -16,19 +17,28 @@ import java.util.List;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MainPage extends BasePage<MainPage> {
 
   public static final String URL = CFG.frontUrl() + "main";
 
-  protected final Header header = new Header();
-  protected final SpendingTable spendingTable = new SpendingTable();
-  protected final StatComponent statComponent = new StatComponent();
-  private final SelenideElement statisticImageCanvas = $("canvas[role='img']");
-  private final ElementsCollection statisticCells = $$("#legend-container li");
+  protected final Header header;
+  protected final SpendingTable spendingTable;
+  protected final StatComponent statComponent;
+
+  private final SelenideElement statisticImageCanvas;
+  private final ElementsCollection statisticCells;
+
+
+  public MainPage(SelenideDriver driver) {
+    super(driver);
+    this.header = new Header(driver);
+    this.spendingTable = new SpendingTable(driver);
+    this.statComponent = new StatComponent(driver);
+    this.statisticImageCanvas = driver.$("canvas[role='img']");
+    this.statisticCells = driver.$$("#legend-container li");
+  }
 
   @Nonnull
   public Header getHeader() {
