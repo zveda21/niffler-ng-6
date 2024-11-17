@@ -1,16 +1,12 @@
+
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.UsersClient;
 import guru.qa.niffler.service.impl.UsersApiClient;
-import guru.qa.niffler.service.impl.UsersDbClient;
 import guru.qa.niffler.utils.RandomDataUtils;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 public class UserExtension implements BeforeEachCallback, ParameterResolver {
@@ -23,20 +19,20 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
     AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
-        .ifPresent(userAnno -> {
-          if ("".equals(userAnno.username())) {
-            final String username = RandomDataUtils.randomUsername();
-            UserJson testUser = usersClient.createUser(username, defaultPassword);
+            .ifPresent(userAnno -> {
+              if ("".equals(userAnno.username())) {
+                final String username = RandomDataUtils.randomUsername();
+                UserJson testUser = usersClient.createUser(username, defaultPassword);
 
-            usersClient.addIncomeInvitation(testUser, userAnno.incomeInvitations());
-            usersClient.addOutcomeInvitation(testUser, userAnno.outcomeInvitations());
-            usersClient.addFriend(testUser, userAnno.friends());
-            context.getStore(NAMESPACE).put(
-                context.getUniqueId(),
-                testUser
-            );
-          }
-        });
+                usersClient.addIncomeInvitation(testUser, userAnno.incomeInvitations());
+                usersClient.addOutcomeInvitation(testUser, userAnno.outcomeInvitations());
+                usersClient.addFriend(testUser, userAnno.friends());
+                context.getStore(NAMESPACE).put(
+                        context.getUniqueId(),
+                        testUser
+                );
+              }
+            });
   }
 
   @Override
