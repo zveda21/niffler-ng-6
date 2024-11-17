@@ -32,12 +32,14 @@ public class ProfileTest {
   void archivedCategoryShouldPresentInCategoriesList(UserJson user) {
     final String categoryName = user.testData().categoryDescriptions()[0];
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .checkThatPageLoaded();
 
-    driver.open(ProfilePage.URL, ProfilePage.class)
+    driver.open(ProfilePage.URL);
+    new ProfilePage(driver)
         .checkArchivedCategoryExists(categoryName);
   }
 
@@ -50,12 +52,14 @@ public class ProfileTest {
   void activeCategoryShouldPresentInCategoriesList(UserJson user) {
     final String categoryName = user.testData().categoryDescriptions()[0];
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .checkThatPageLoaded();
 
-    driver.open(ProfilePage.URL, ProfilePage.class)
+    driver.open(ProfilePage.URL);
+    new ProfilePage(driver)
         .checkCategoryExists(categoryName);
   }
 
@@ -64,9 +68,10 @@ public class ProfileTest {
   void shouldUpdateProfileWithAllFieldsSet(UserJson user) {
     final String newName = randomName();
 
-    ProfilePage profilePage = driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .checkThatPageLoaded()
         .getHeader()
         .toProfilePage()
@@ -77,7 +82,7 @@ public class ProfileTest {
 
     driver.refresh();
 
-    profilePage.checkName(newName)
+    new ProfilePage(driver).checkName(newName)
         .checkPhotoExist();
   }
 
@@ -86,9 +91,10 @@ public class ProfileTest {
   void shouldUpdateProfileWithOnlyRequiredFields(UserJson user) {
     final String newName = randomName();
 
-    ProfilePage profilePage = driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .checkThatPageLoaded()
         .getHeader()
         .toProfilePage()
@@ -98,7 +104,7 @@ public class ProfileTest {
 
     driver.refresh();
 
-    profilePage.checkName(newName);
+    new ProfilePage(driver).checkName(newName);
   }
 
   @User
@@ -106,9 +112,10 @@ public class ProfileTest {
   void shouldAddNewCategory(UserJson user) {
     String newCategory = randomCategoryName();
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .checkThatPageLoaded()
         .getHeader()
         .toProfilePage()
@@ -131,9 +138,10 @@ public class ProfileTest {
   )
   @Test
   void shouldForbidAddingMoreThat8Categories(UserJson user) {
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .checkThatPageLoaded()
         .getHeader()
         .toProfilePage()
@@ -143,9 +151,10 @@ public class ProfileTest {
   @User
   @ScreenShotTest(value = "img/expected_profile_image.png")
   void checkProfileImageTest(UserJson user, BufferedImage expectedProfileImage) throws IOException {
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
             .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
+            .submit(new MainPage(driver))
             .checkThatPageLoaded()
             .getHeader()
             .toProfilePage()

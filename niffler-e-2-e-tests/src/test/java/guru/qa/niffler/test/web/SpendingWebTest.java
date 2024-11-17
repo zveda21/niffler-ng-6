@@ -9,6 +9,7 @@ import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.rest.UserJson;
+import guru.qa.niffler.page.EditSpendingPage;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.component.StatComponent;
@@ -39,15 +40,16 @@ public class SpendingWebTest {
   void categoryDescriptionShouldBeChangedFromTable(UserJson user) {
     final String newDescription = "Обучение Niffler Next Generation";
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getSpendingTable()
         .editSpending("Обучение Advanced 2.0")
         .setNewSpendingDescription(newDescription)
         .saveSpending();
 
-    new MainPage().getSpendingTable()
+    new MainPage(driver).getSpendingTable()
         .checkTableContains(newDescription);
   }
 
@@ -59,28 +61,31 @@ public class SpendingWebTest {
     Date currentDate = new Date();
     String description = RandomDataUtils.randomSentence(3);
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .addSpendingPage()
         .setNewSpendingCategory(category)
-        .setNewSpendingAmount(amount)
+            .setNewSpendingAmount(amount);
+    new EditSpendingPage(driver)
         .setNewSpendingDate(currentDate)
         .setNewSpendingDescription(description)
         .saveSpending()
         .checkAlertMessage("New spending is successfully created");
 
-    new MainPage().getSpendingTable()
+    new MainPage(driver).getSpendingTable()
         .checkTableContains(description);
   }
 
   @User
   @Test
   void shouldNotAddSpendingWithEmptyCategory(UserJson user) {
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .addSpendingPage()
         .setNewSpendingAmount(100)
@@ -92,9 +97,10 @@ public class SpendingWebTest {
   @User
   @Test
   void shouldNotAddSpendingWithEmptyAmount(UserJson user) {
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .addSpendingPage()
         .setNewSpendingCategory("Friends")
@@ -112,9 +118,10 @@ public class SpendingWebTest {
   )
   @Test
   void deleteSpendingTest(UserJson user) {
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getSpendingTable()
         .deleteSpending("Обучение Advanced 2.0")
         .checkTableSize(0);
@@ -129,19 +136,20 @@ public class SpendingWebTest {
   )
   @ScreenShotTest("img/expected-stat.png")
   void checkStatComponentTest(UserJson user, BufferedImage expected) throws IOException, InterruptedException {
-    StatComponent statComponent = driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
             .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
+            .submit(new MainPage(driver))
             .getStatComponent();
 
     Thread.sleep(3000);
 
     assertFalse(new ScreenDiffResult(
             expected,
-            statComponent.chartScreenshot()
+            new StatComponent(driver).chartScreenshot()
     ), "Screen comparison failure");
 
-    statComponent.checkBubbles(Color.yellow);
+    new StatComponent(driver).checkBubbles(Color.yellow);
   }
 
   @User(
@@ -153,14 +161,15 @@ public class SpendingWebTest {
   )
   @Test
   void checkStatComponents(UserJson user) throws InterruptedException {
-    StatComponent statComponent = driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
             .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
+            .submit(new MainPage(driver))
             .getStatComponent();
 
     Thread.sleep(3000);
 
-    statComponent.checkBubblesInCorrectOrder(new Bubble(
+    new StatComponent(driver).checkBubblesInCorrectOrder(new Bubble(
             Color.yellow,
             "Home 87000 ₽"
     ));
@@ -186,15 +195,15 @@ public class SpendingWebTest {
   )
   @Test
   void checkStatBubblesInAnyOrder(UserJson user) throws InterruptedException {
-    StatComponent statComponent = driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
             .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
+            .submit(new MainPage(driver))
             .getStatComponent();
     Thread.sleep(3000);
     Bubble bubble1 = new Bubble(Color.yellow, "Shopping 2000 ₽");
     Bubble bubble2 = new Bubble(Color.green, "Home 150 ₽");
-    statComponent.checkBubblesInAnyOrder(bubble2, bubble1);
-
+    new StatComponent(driver).checkBubblesInAnyOrder(bubble2, bubble1);
   }
 
   @User(
@@ -213,9 +222,10 @@ public class SpendingWebTest {
   )
   @Test
   void checkStatComponentsContains(UserJson user) throws InterruptedException {
-    StatComponent statComponent = driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
             .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
+            .submit(new MainPage(driver))
             .getStatComponent();
 
     Thread.sleep(3000);
@@ -224,6 +234,6 @@ public class SpendingWebTest {
             Color.green,
             "Shopping 340 ₽"
     );
-    statComponent.checkBubblesContains(bubble_1);
+    new StatComponent(driver).checkBubblesContains(bubble_1);
   }
 }

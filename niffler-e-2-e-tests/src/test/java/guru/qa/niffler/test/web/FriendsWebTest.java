@@ -1,6 +1,5 @@
 package guru.qa.niffler.test.web;
 
-import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideDriver;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
@@ -9,10 +8,8 @@ import guru.qa.niffler.page.FriendsPage;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.PeoplePage;
-import org.junit.jupiter.api.Test;
 import guru.qa.niffler.utils.SelenideUtils;
-
-import static com.codeborne.selenide.Selenide.open;
+import org.junit.jupiter.api.Test;
 
 @WebTest
 public class FriendsWebTest {
@@ -24,9 +21,10 @@ public class FriendsWebTest {
   void friendShouldBePresentInFriendsTable(UserJson user) {
     final String friendUsername = user.testData().friendsUsernames()[0];
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .toFriendsPage()
         .checkExistingFriends(friendUsername);
@@ -35,9 +33,10 @@ public class FriendsWebTest {
   @User
   @Test
   void friendsTableShouldBeEmptyForNewUser(UserJson user) {
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .toFriendsPage()
         .checkExistingFriendsCount(0);
@@ -48,9 +47,10 @@ public class FriendsWebTest {
   void incomeInvitationBePresentInFriendsTable(UserJson user) {
     final String incomeInvitationUsername = user.testData().incomeInvitationsUsernames()[0];
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .toFriendsPage()
         .checkExistingInvitations(incomeInvitationUsername);
@@ -61,9 +61,10 @@ public class FriendsWebTest {
   void outcomeInvitationBePresentInAllPeoplesTable(UserJson user) {
     final String outcomeInvitationUsername = user.testData().outcomeInvitationsUsernames()[0];
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .toAllPeoplesPage()
         .checkInvitationSentToUser(outcomeInvitationUsername);
@@ -74,9 +75,10 @@ public class FriendsWebTest {
   void shouldRemoveFriend(UserJson user) {
     final String userToRemove = user.testData().friendsUsernames()[0];
 
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .toFriendsPage()
         .removeFriend(userToRemove)
@@ -88,9 +90,10 @@ public class FriendsWebTest {
   void shouldAcceptInvitation(UserJson user) {
     final String userToAccept = user.testData().incomeInvitationsUsernames()[0];
 
-    FriendsPage friendsPage = driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .toFriendsPage()
         .checkExistingInvitationsCount(1)
@@ -98,7 +101,7 @@ public class FriendsWebTest {
 
     driver.refresh();
 
-    friendsPage.checkExistingInvitationsCount(0)
+    new FriendsPage(driver).checkExistingInvitationsCount(0)
         .checkExistingFriendsCount(1)
         .checkExistingFriends(userToAccept);
   }
@@ -108,9 +111,10 @@ public class FriendsWebTest {
   void shouldDeclineInvitation(UserJson user) {
     final String userToDecline = user.testData().incomeInvitationsUsernames()[0];
 
-    FriendsPage friendsPage = driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .getHeader()
         .toFriendsPage()
         .checkExistingInvitationsCount(1)
@@ -118,10 +122,10 @@ public class FriendsWebTest {
 
     driver.refresh();
 
-    friendsPage.checkExistingInvitationsCount(0)
+    new FriendsPage(driver).checkExistingInvitationsCount(0)
         .checkExistingFriendsCount(0);
 
-    driver.open(PeoplePage.URL, PeoplePage.class)
-        .checkExistingUser(userToDecline);
+    driver.open(PeoplePage.URL);
+    new PeoplePage(driver).checkExistingUser(userToDecline);
   }
 }
