@@ -48,10 +48,12 @@ public class SpendConditions {
 
                     actualSpends.add(String.format("Category: %s, Amount: %s, Description: %s, Date: %s", category, amount, description, actualDate));
 
-                    if (!category.equals(expectedSpend.category().name()) ||
-                            !amount.equals(String.format("%.0f", expectedSpend.amount())) ||
-                            !description.equals(expectedSpend.description()) ||
-                            !actualDate.equals(dateFormatter.format(expectedSpend.spendDate()))) {
+                    if (category.equals(expectedSpend.category().name()) &&
+                            amount.equals(String.format("%.0f", expectedSpend.amount())) &&
+                            description.equals(expectedSpend.description()) &&
+                            actualDate.equals(dateFormatter.format(expectedSpend.spendDate()))) {
+                        isValid = true;
+                    } else {
                         isValid = false;
                     }
                 }
