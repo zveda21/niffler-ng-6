@@ -5,11 +5,7 @@ import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.model.allure.ScreenDif;
 import io.qameta.allure.Allure;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
+import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.springframework.core.io.ClassPathResource;
 
@@ -42,15 +38,15 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
   public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
     if (throwable.getMessage().contains("Screen comparison failure")) {
       ScreenDif screenDif = new ScreenDif(
-          "data:image/png;base64," + encoder.encodeToString(imageToBytes(getExpected())),
-          "data:image/png;base64," + encoder.encodeToString(imageToBytes(getActual())),
-          "data:image/png;base64," + encoder.encodeToString(imageToBytes(getDiff()))
+              "data:image/png;base64," + encoder.encodeToString(imageToBytes(getExpected())),
+              "data:image/png;base64," + encoder.encodeToString(imageToBytes(getActual())),
+              "data:image/png;base64," + encoder.encodeToString(imageToBytes(getDiff()))
       );
 
       Allure.addAttachment(
-          "Screenshot diff",
-          "application/vnd.allure.image.diff",
-          objectMapper.writeValueAsString(screenDif)
+              "Screenshot diff",
+              "application/vnd.allure.image.diff",
+              objectMapper.writeValueAsString(screenDif)
       );
     }
     throw throwable;

@@ -1,6 +1,6 @@
 package guru.qa.niffler.test.web;
 
-import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideDriver;
 import guru.qa.niffler.condition.Bubble;
 import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.jupiter.annotation.Category;
@@ -14,6 +14,7 @@ import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.component.StatComponent;
 import guru.qa.niffler.utils.RandomDataUtils;
 import guru.qa.niffler.utils.ScreenDiffResult;
+import guru.qa.niffler.utils.SelenideUtils;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
@@ -25,27 +26,29 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @WebTest
 public class SpendingWebTest {
 
+  private final SelenideDriver driver = new SelenideDriver(SelenideUtils.chromeConfig);
+
   @User(
-          spendings = @Spending(
-                  category = "Обучение",
-                  description = "Обучение Advanced 2.0",
-                  amount = 79990
-          )
+      spendings = @Spending(
+          category = "Обучение",
+          description = "Обучение Advanced 2.0",
+          amount = 79990
+      )
   )
   @Test
   void categoryDescriptionShouldBeChangedFromTable(UserJson user) {
     final String newDescription = "Обучение Niffler Next Generation";
 
-    Selenide.open(LoginPage.URL, LoginPage.class)
-            .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
-            .getSpendingTable()
-            .editSpending("Обучение Advanced 2.0")
-            .setNewSpendingDescription(newDescription)
-            .saveSpending();
+    driver.open(LoginPage.URL, LoginPage.class)
+        .fillLoginPage(user.username(), user.testData().password())
+        .submit(new MainPage())
+        .getSpendingTable()
+        .editSpending("Обучение Advanced 2.0")
+        .setNewSpendingDescription(newDescription)
+        .saveSpending();
 
     new MainPage().getSpendingTable()
-            .checkTableContains(newDescription);
+        .checkTableContains(newDescription);
   }
 
   @User
@@ -56,77 +59,77 @@ public class SpendingWebTest {
     Date currentDate = new Date();
     String description = RandomDataUtils.randomSentence(3);
 
-    Selenide.open(LoginPage.URL, LoginPage.class)
-            .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
-            .getHeader()
-            .addSpendingPage()
-            .setNewSpendingCategory(category)
-            .setNewSpendingAmount(amount)
-            .setNewSpendingDate(currentDate)
-            .setNewSpendingDescription(description)
-            .saveSpending()
-            .checkAlertMessage("New spending is successfully created");
+    driver.open(LoginPage.URL, LoginPage.class)
+        .fillLoginPage(user.username(), user.testData().password())
+        .submit(new MainPage())
+        .getHeader()
+        .addSpendingPage()
+        .setNewSpendingCategory(category)
+        .setNewSpendingAmount(amount)
+        .setNewSpendingDate(currentDate)
+        .setNewSpendingDescription(description)
+        .saveSpending()
+        .checkAlertMessage("New spending is successfully created");
 
     new MainPage().getSpendingTable()
-            .checkTableContains(description);
+        .checkTableContains(description);
   }
 
   @User
   @Test
   void shouldNotAddSpendingWithEmptyCategory(UserJson user) {
-    Selenide.open(LoginPage.URL, LoginPage.class)
-            .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
-            .getHeader()
-            .addSpendingPage()
-            .setNewSpendingAmount(100)
-            .setNewSpendingDate(new Date())
-            .saveSpending()
-            .checkFormErrorMessage("Please choose category");
+    driver.open(LoginPage.URL, LoginPage.class)
+        .fillLoginPage(user.username(), user.testData().password())
+        .submit(new MainPage())
+        .getHeader()
+        .addSpendingPage()
+        .setNewSpendingAmount(100)
+        .setNewSpendingDate(new Date())
+        .saveSpending()
+        .checkFormErrorMessage("Please choose category");
   }
 
   @User
   @Test
   void shouldNotAddSpendingWithEmptyAmount(UserJson user) {
-    Selenide.open(LoginPage.URL, LoginPage.class)
-            .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
-            .getHeader()
-            .addSpendingPage()
-            .setNewSpendingCategory("Friends")
-            .setNewSpendingDate(new Date())
-            .saveSpending()
-            .checkFormErrorMessage("Amount has to be not less then 0.01");
+    driver.open(LoginPage.URL, LoginPage.class)
+        .fillLoginPage(user.username(), user.testData().password())
+        .submit(new MainPage())
+        .getHeader()
+        .addSpendingPage()
+        .setNewSpendingCategory("Friends")
+        .setNewSpendingDate(new Date())
+        .saveSpending()
+        .checkFormErrorMessage("Amount has to be not less then 0.01");
   }
 
   @User(
-          spendings = @Spending(
-                  category = "Обучение",
-                  description = "Обучение Advanced 2.0",
-                  amount = 79990
-          )
+      spendings = @Spending(
+          category = "Обучение",
+          description = "Обучение Advanced 2.0",
+          amount = 79990
+      )
   )
   @Test
   void deleteSpendingTest(UserJson user) {
-    Selenide.open(LoginPage.URL, LoginPage.class)
-            .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
-            .getSpendingTable()
-            .deleteSpending("Обучение Advanced 2.0")
-            .checkTableSize(0);
+    driver.open(LoginPage.URL, LoginPage.class)
+        .fillLoginPage(user.username(), user.testData().password())
+        .submit(new MainPage())
+        .getSpendingTable()
+        .deleteSpending("Обучение Advanced 2.0")
+        .checkTableSize(0);
   }
 
   @User(
-          spendings = @Spending(
-                  category = "Обучение",
-                  description = "Обучение Advanced 2.0",
-                  amount = 79990
-          )
+      spendings = @Spending(
+          category = "Обучение",
+          description = "Обучение Advanced 2.0",
+          amount = 79990
+      )
   )
   @ScreenShotTest("img/expected-stat.png")
   void checkStatComponentTest(UserJson user, BufferedImage expected) throws IOException, InterruptedException {
-    StatComponent statComponent = Selenide.open(LoginPage.URL, LoginPage.class)
+    StatComponent statComponent = driver.open(LoginPage.URL, LoginPage.class)
             .fillLoginPage(user.username(), user.testData().password())
             .submit(new MainPage())
             .getStatComponent();
@@ -150,7 +153,7 @@ public class SpendingWebTest {
   )
   @Test
   void checkStatComponents(UserJson user) throws InterruptedException {
-    StatComponent statComponent = Selenide.open(LoginPage.URL, LoginPage.class)
+    StatComponent statComponent = driver.open(LoginPage.URL, LoginPage.class)
             .fillLoginPage(user.username(), user.testData().password())
             .submit(new MainPage())
             .getStatComponent();
@@ -183,7 +186,7 @@ public class SpendingWebTest {
   )
   @Test
   void checkStatBubblesInAnyOrder(UserJson user) throws InterruptedException {
-    StatComponent statComponent = Selenide.open(LoginPage.URL, LoginPage.class)
+    StatComponent statComponent = driver.open(LoginPage.URL, LoginPage.class)
             .fillLoginPage(user.username(), user.testData().password())
             .submit(new MainPage())
             .getStatComponent();
@@ -210,7 +213,7 @@ public class SpendingWebTest {
   )
   @Test
   void checkStatComponentsContains(UserJson user) throws InterruptedException {
-    StatComponent statComponent = Selenide.open(LoginPage.URL, LoginPage.class)
+    StatComponent statComponent = driver.open(LoginPage.URL, LoginPage.class)
             .fillLoginPage(user.username(), user.testData().password())
             .submit(new MainPage())
             .getStatComponent();
