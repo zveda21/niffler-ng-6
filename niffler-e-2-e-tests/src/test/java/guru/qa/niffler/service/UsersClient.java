@@ -18,5 +18,4 @@ public interface UsersClient {
 
   void addFriend(UserJson targetUser, int count);
 
-  List<UserJson> getAllUsers(String username, @Nullable String searchQuery);
 }
