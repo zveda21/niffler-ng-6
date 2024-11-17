@@ -1,8 +1,6 @@
 package guru.qa.niffler.jupiter.extension;
 
-import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideDriver;
-import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.Allure;
 import io.qameta.allure.selenide.AllureSelenide;
@@ -21,15 +19,16 @@ public class BrowserExtension implements
     LifecycleMethodExecutionExceptionHandler {
 
   private final List<SelenideDriver> drivers = new ArrayList<>();
-
   public List<SelenideDriver> drivers() {
     return drivers;
   }
 
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
-    if (WebDriverRunner.hasWebDriverStarted()) {
-      Selenide.closeWebDriver();
+    for (SelenideDriver driver : drivers) {
+      if (driver.hasWebDriverStarted()) {
+        driver.close();
+      }
     }
   }
 

@@ -18,12 +18,13 @@ public class RegistrationTest {
   void shouldRegisterNewUser() {
     String newUsername = randomUsername();
     String password = "12345";
-    driver.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .doRegister()
         .fillRegisterPage(newUsername, password, password)
         .successSubmit()
         .fillLoginPage(newUsername, password)
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .checkThatPageLoaded();
   }
 
@@ -32,11 +33,12 @@ public class RegistrationTest {
     String existingUsername = "duck";
     String password = "12345";
 
-    LoginPage loginPage = driver.open(LoginPage.URL, LoginPage.class);
-    loginPage.doRegister()
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+            .doRegister()
         .fillRegisterPage(existingUsername, password, password)
         .errorSubmit();
-    loginPage.checkError("Username `" + existingUsername + "` already exists");
+    new LoginPage(driver).checkError("Username `" + existingUsername + "` already exists");
   }
 
   @Test
@@ -44,10 +46,11 @@ public class RegistrationTest {
     String newUsername = randomUsername();
     String password = "12345";
 
-    LoginPage loginPage = driver.open(LoginPage.URL, LoginPage.class);
-    loginPage.doRegister()
+    driver.open(LoginPage.URL);
+
+    new LoginPage(driver).doRegister()
         .fillRegisterPage(newUsername, password, "bad password submit")
         .errorSubmit();
-    loginPage.checkError("Passwords should be equal");
+    new LoginPage(driver).checkError("Passwords should be equal");
   }
 }

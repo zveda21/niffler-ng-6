@@ -30,7 +30,7 @@ public class LoginTest {
     driver.open(LoginPage.URL);
     new LoginPage(driver)
             .fillLoginPage(user.username(), user.testData().password())
-        .submit(new MainPage())
+        .submit(new MainPage(driver))
         .checkThatPageLoaded();
   }
 
