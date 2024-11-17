@@ -14,10 +14,6 @@ import static com.codeborne.selenide.Selenide.$$;
 public abstract class BasePage<T extends BasePage<?>> {
 
   protected static final Config CFG = Config.getInstance();
-
-//  private final SelenideElement alert = $(".MuiSnackbar-root");
-//  private final ElementsCollection formErrors = $$("p.Mui-error, .input__helper-text");
-
   private final SelenideElement alert;
   private final ElementsCollection formErrors;
 
