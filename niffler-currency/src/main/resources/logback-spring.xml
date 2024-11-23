@@ -1,4 +1,3 @@
-
 <configuration>
     <property name="LOG_LEVEL" value="INFO"/>
     <property name="LOG_PATH" value="${LOG_PATH:-../logs/niffler-auth}/app.log"/>

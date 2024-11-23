@@ -1,39 +1,52 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.utils.ScreenDiffResult;
 import io.qameta.allure.Step;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.Nonnull;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Objects;
 
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.attributeMatching;
-import static com.codeborne.selenide.Condition.disabled;
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.value;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Condition.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ProfilePage extends BasePage<ProfilePage> {
 
   public static final String URL = CFG.frontUrl() + "profile";
 
-  private final SelenideElement avatar = $("#image__input").parent().$("img");
-  private final SelenideElement userName = $("#username");
-  private final SelenideElement nameInput = $("#name");
-  private final SelenideElement photoInput = $("input[type='file']");
-  private final SelenideElement submitButton = $("button[type='submit']");
-  private final SelenideElement categoryInput = $("input[name='category']");
-  private final SelenideElement archivedSwitcher = $(".MuiSwitch-input");
+  private final SelenideElement avatar;
+  private final SelenideElement userName;
+  private final SelenideElement nameInput;
+  private final SelenideElement photoInput;
+  private final SelenideElement submitButton;
+  private final SelenideElement categoryInput;
+  private final SelenideElement archivedSwitcher;
+  private final SelenideElement profileImage;
+  private final ElementsCollection bubbles;
+  private final ElementsCollection bubblesArchived;
 
-  private final ElementsCollection bubbles = $$(".MuiChip-filled.MuiChip-colorPrimary");
-  private final ElementsCollection bubblesArchived = $$(".MuiChip-filled.MuiChip-colorDefault");
+  public ProfilePage(SelenideDriver driver) {
+    super(driver);
+    this.avatar = driver.$("#image__input").parent().$("img");
+    this.userName = driver.$("#username");
+    this.nameInput = driver.$("#name");
+    this.photoInput = driver.$("input[type='file']");
+    this.submitButton = driver.$("button[type='submit']");
+    this.categoryInput = driver.$("input[name='category']");
+    this.archivedSwitcher = driver.$(".MuiSwitch-input");
+    this.profileImage = driver.$(".MuiAvatar-img");
+    this.bubbles = driver.$$(".MuiChip-filled.MuiChip-colorPrimary");
+    this.bubblesArchived = driver.$$(".MuiChip-filled.MuiChip-colorDefault");
+  }
 
   @Step("Set name: {0}")
   @Nonnull
@@ -123,6 +136,14 @@ public class ProfilePage extends BasePage<ProfilePage> {
   @Nonnull
   public ProfilePage checkThatPageLoaded() {
     userName.should(visible);
+    return this;
+  }
+
+  @Step("Check profile image matches the expected image")
+  @Nonnull
+  public ProfilePage checkProfileImage(BufferedImage expectedImage) throws IOException {
+    BufferedImage actualImage = ImageIO.read(Objects.requireNonNull(profileImage.screenshot()));
+    assertFalse(new ScreenDiffResult(actualImage, expectedImage));
     return this;
   }
 }
