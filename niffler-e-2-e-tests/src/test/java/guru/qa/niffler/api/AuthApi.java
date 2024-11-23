@@ -21,7 +21,7 @@ public interface AuthApi {
 
   @POST("oauth2/token")
   @FormUrlEncoded
-  Call<JsonNode> token(
+  Call<String> token(
       @Field("client_id") String clientId,
       @Field(value = "redirect_uri", encoded = true) String redirectUri,
       @Field("grant_type") String grantType,
@@ -30,7 +30,7 @@ public interface AuthApi {
 
   @POST("login")
   @FormUrlEncoded
-  Call<Void> login(
+  Call<String> login(
       @Field("username") String username,
       @Field("password") String password,
       @Field("_csrf") String csrf);
