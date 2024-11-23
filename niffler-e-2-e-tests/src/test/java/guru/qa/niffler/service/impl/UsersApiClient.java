@@ -12,8 +12,12 @@ import io.qameta.allure.Step;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 import static java.util.Objects.requireNonNull;
@@ -30,21 +34,21 @@ public class UsersApiClient implements UsersClient {
 
   @NotNull
   @Override
-  @Step("Crete user using API")
+  @Step("Create user using API")
   public UserJson createUser(String username, String password) {
     try {
       authApi.requestRegisterForm().execute();
       authApi.register(
-          username,
-          password,
-          password,
-          ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
+              username,
+              password,
+              password,
+              ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
       ).execute();
       UserJson createdUser = requireNonNull(userdataApi.currentUser(username).execute().body());
       return createdUser.addTestData(
-          new TestData(
-              password
-          )
+              new TestData(
+                      password
+              )
       );
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -62,8 +66,8 @@ public class UsersApiClient implements UsersClient {
           newUser = createUser(username, defaultPassword);
 
           response = userdataApi.sendInvitation(
-              newUser.username(),
-              targetUser.username()
+                  newUser.username(),
+                  targetUser.username()
           ).execute();
         } catch (IOException e) {
           throw new AssertionError(e);
@@ -71,8 +75,8 @@ public class UsersApiClient implements UsersClient {
         assertEquals(200, response.code());
 
         targetUser.testData()
-            .incomeInvitations()
-            .add(newUser);
+                .incomeInvitations()
+                .add(newUser);
       }
     }
   }
@@ -88,8 +92,8 @@ public class UsersApiClient implements UsersClient {
           newUser = createUser(username, defaultPassword);
 
           response = userdataApi.sendInvitation(
-              targetUser.username(),
-              newUser.username()
+                  targetUser.username(),
+                  newUser.username()
           ).execute();
         } catch (IOException e) {
           throw new RuntimeException(e);
@@ -97,8 +101,8 @@ public class UsersApiClient implements UsersClient {
         assertEquals(200, response.code());
 
         targetUser.testData()
-            .outcomeInvitations()
-            .add(newUser);
+                .outcomeInvitations()
+                .add(newUser);
       }
     }
   }
@@ -111,11 +115,11 @@ public class UsersApiClient implements UsersClient {
         final Response<UserJson> response;
         try {
           userdataApi.sendInvitation(
-              createUser(
-                  username,
-                  defaultPassword
-              ).username(),
-              targetUser.username()
+                  createUser(
+                          username,
+                          defaultPassword
+                  ).username(),
+                  targetUser.username()
           ).execute();
           response = userdataApi.acceptInvitation(targetUser.username(), username).execute();
         } catch (IOException e) {
@@ -124,9 +128,24 @@ public class UsersApiClient implements UsersClient {
         assertEquals(200, response.code());
 
         targetUser.testData()
-            .friends()
-            .add(response.body());
+                .friends()
+                .add(response.body());
       }
     }
+  }
+
+  @Nonnull
+  public List<UserJson> allUsers(@Nonnull String username, @Nullable String searchQuery) {
+    final Response<List<UserJson>> response;
+    try {
+      response = userdataApi.allUsers(username, searchQuery)
+              .execute();
+    } catch (IOException e) {
+      throw new AssertionError(e);
+    }
+    assertEquals(200, response.code());
+    return response.body() != null
+            ? response.body()
+            : Collections.emptyList();
   }
 }
