@@ -1,6 +1,5 @@
 package guru.qa.niffler.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.internal.lang3.StringUtils;
 import guru.qa.niffler.api.AuthApi;
@@ -8,7 +7,6 @@ import guru.qa.niffler.api.core.RestClient;
 import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.utils.OAuthUtils;
-import lombok.SneakyThrows;
 import retrofit2.Response;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
@@ -55,7 +53,7 @@ public class AuthApiClient extends RestClient {
         Response<String> tokenResponse = authApi.token(
                 CLIENT_ID,
                 REDIRECT_URL,
-                "authorization_code",
+                GRANT_TYPE,
                 code,
                 codeVerifier
         ).execute();
