@@ -148,4 +148,19 @@ public class UsersApiClient implements UsersClient {
             ? response.body()
             : Collections.emptyList();
   }
+
+  @Step("Retrieve all friends using API")
+  @Nonnull
+  public List<UserJson> friends(@Nonnull String username, @Nullable String searchQuery) {
+    final Response<List<UserJson>> response;
+    try {
+      response = userdataApi.friends(username, searchQuery).execute();
+    } catch (IOException e) {
+      throw new AssertionError(e);
+    }
+    assertEquals(200, response.code());
+    return response.body() != null
+            ? response.body()
+            : Collections.emptyList();
+  }
 }
