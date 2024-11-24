@@ -1,28 +1,25 @@
 package guru.qa.niffler.utils;
 
-import lombok.SneakyThrows;
-
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.Random;
 
 public class OAuthUtils {
 
-  private static SecureRandom secureRandom = new SecureRandom();
+    public static String generateCodeVerifier() {
+        byte[] randomBytes = new byte[32];
+        new Random().nextBytes(randomBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+    }
 
-  public static String generateCodeVerifier() {
-    byte[] codeVerifier = new byte[32];
-    secureRandom.nextBytes(codeVerifier);
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(codeVerifier);
-  }
-
-  @SneakyThrows
-  public static String generateCodeChallange(String codeVerifier) {
-    byte[] bytes = codeVerifier.getBytes(Charset.forName("US-ASCII"));
-    MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-    messageDigest.update(bytes, 0, bytes.length);
-    byte[] digest = messageDigest.digest();
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
-  }
+    public static String generateCodeChallenge(String codeVerifier) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(codeVerifier.getBytes());
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not found", e);
+        }
+    }
 }

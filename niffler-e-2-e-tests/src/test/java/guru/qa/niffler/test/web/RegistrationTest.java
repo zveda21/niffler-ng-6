@@ -1,9 +1,10 @@
 package guru.qa.niffler.test.web;
 
-import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideDriver;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
+import guru.qa.niffler.utils.SelenideUtils;
 import org.junit.jupiter.api.Test;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
@@ -11,16 +12,19 @@ import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 @WebTest
 public class RegistrationTest {
 
+  private final SelenideDriver driver = new SelenideDriver(SelenideUtils.chromeConfig);
+
   @Test
   void shouldRegisterNewUser() {
     String newUsername = randomUsername();
     String password = "12345";
-    Selenide.open(LoginPage.URL, LoginPage.class)
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
         .doRegister()
         .fillRegisterPage(newUsername, password, password)
         .successSubmit()
         .fillLoginPage(newUsername, password)
-        .submit(new MainPage())
+            .submit(new MainPage(driver))
         .checkThatPageLoaded();
   }
 
@@ -29,11 +33,12 @@ public class RegistrationTest {
     String existingUsername = "duck";
     String password = "12345";
 
-    LoginPage loginPage = Selenide.open(LoginPage.URL, LoginPage.class);
-    loginPage.doRegister()
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+            .doRegister()
         .fillRegisterPage(existingUsername, password, password)
         .errorSubmit();
-    loginPage.checkError("Username `" + existingUsername + "` already exists");
+    new LoginPage(driver).checkError("Username `" + existingUsername + "` already exists");
   }
 
   @Test
@@ -41,10 +46,11 @@ public class RegistrationTest {
     String newUsername = randomUsername();
     String password = "12345";
 
-    LoginPage loginPage = Selenide.open(LoginPage.URL, LoginPage.class);
-    loginPage.doRegister()
+    driver.open(LoginPage.URL);
+
+    new LoginPage(driver).doRegister()
         .fillRegisterPage(newUsername, password, "bad password submit")
         .errorSubmit();
-    loginPage.checkError("Passwords should be equal");
+    new LoginPage(driver).checkError("Passwords should be equal");
   }
 }

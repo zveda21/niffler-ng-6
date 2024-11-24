@@ -9,12 +9,13 @@ import guru.qa.niffler.page.FriendsPage;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.PeoplePage;
+import guru.qa.niffler.utils.SelenideUtils;
 import org.junit.jupiter.api.Test;
-
-import static com.codeborne.selenide.Selenide.open;
 
 @WebTest
 public class FriendsWebTest {
+
+  private final SelenideDriver driver = new SelenideDriver(SelenideUtils.chromeConfig);
 
   @User(friends = 1)
   @Test
@@ -75,9 +76,9 @@ public class FriendsWebTest {
         .checkExistingInvitationsCount(1)
         .acceptFriendInvitationFromUser(userToAccept);
 
-    Selenide.refresh();
+    driver.refresh();
 
-    friendsPage.checkExistingInvitationsCount(0)
+    new FriendsPage(driver).checkExistingInvitationsCount(0)
         .checkExistingFriendsCount(1)
         .checkExistingFriends(userToAccept);
   }
@@ -92,12 +93,12 @@ public class FriendsWebTest {
         .checkExistingInvitationsCount(1)
         .declineFriendInvitationFromUser(userToDecline);
 
-    Selenide.refresh();
+    driver.refresh();
 
-    friendsPage.checkExistingInvitationsCount(0)
+    new FriendsPage(driver).checkExistingInvitationsCount(0)
         .checkExistingFriendsCount(0);
 
-    open(PeoplePage.URL, PeoplePage.class)
-        .checkExistingUser(userToDecline);
+    driver.open(PeoplePage.URL);
+    new PeoplePage(driver).checkExistingUser(userToDecline);
   }
 }
