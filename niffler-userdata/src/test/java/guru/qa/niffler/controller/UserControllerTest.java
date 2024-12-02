@@ -44,15 +44,15 @@ class UserControllerTest {
 
   @Test
   void allUsersEndpoint() throws Exception {
-    UserEntity user1 = new UserEntity();
-    user1.setUsername("dima");
-    user1.setCurrency(CurrencyValues.RUB);
-    usersRepository.save(user1);
+    UserEntity firstUser = new UserEntity();
+    firstUser.setUsername("dima");
+    firstUser.setCurrency(CurrencyValues.RUB);
+    usersRepository.save(firstUser);
 
-    UserEntity user2 = new UserEntity();
-    user2.setUsername("anna");
-    user2.setCurrency(CurrencyValues.USD);
-    usersRepository.save(user2);
+    UserEntity secondUser = new UserEntity();
+    secondUser.setUsername("anna");
+    secondUser.setCurrency(CurrencyValues.USD);
+    usersRepository.save(secondUser);
 
     mockMvc.perform(get("/internal/users/all")
                     .contentType(MediaType.APPLICATION_JSON)
