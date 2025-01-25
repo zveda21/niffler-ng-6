@@ -8,7 +8,6 @@ import guru.qa.niffler.data.repository.UserRepository;
 import guru.qa.niffler.ex.NotFoundException;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.model.UserJsonBulk;
-import jaxb.userdata.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
