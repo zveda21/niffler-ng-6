@@ -2,19 +2,27 @@ package guru.qa.niffler.data.repository;
 
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public interface UserdataUserRepository {
 
-    UserEntity create(UserEntity user);
-    Optional<UserEntity> findById(UUID id);
-    Optional<UserEntity> findByUsername(String username);
+  @Nonnull
+  UserEntity create(UserEntity user);
 
-    UserEntity update(UserEntity user);
+  @Nonnull
+  UserEntity update(UserEntity user);
 
-    void sendInvitation(UserEntity requester, UserEntity addressee);
-    void addFriend(UserEntity requester, UserEntity addressee);
+  @Nonnull
+  Optional<UserEntity> findById(UUID id);
 
-    void remove(UserEntity user);
+  @Nonnull
+  Optional<UserEntity> findByUsername(String username);
+
+  void addFriendshipRequest(UserEntity requester, UserEntity addressee);
+
+  void addFriend(UserEntity requester, UserEntity addressee);
 }

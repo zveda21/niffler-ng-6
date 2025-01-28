@@ -2,31 +2,40 @@ package guru.qa.niffler.page.component;
 
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
+import com.codeborne.selenide.SelenideDriver;
 
-import static com.codeborne.selenide.Selenide.$;
+import javax.annotation.Nonnull;
 
-public class SearchField extends BaseComponent<SearchField>{
+import static com.codeborne.selenide.Condition.empty;
+import static com.codeborne.selenide.Condition.not;
 
-    private final SelenideElement searchInput = $("input[placeholder='Search']");
+public class SearchField extends BaseComponent<SearchField> {
 
-    public SearchField(SelenideElement self) {
-        super(self);
+  public SearchField(@Nonnull SelenideElement self, SelenideDriver driver) {
+    super(self, driver);
+    this.clearSearchInputBtn = driver.$("#input-clear");
+  }
+  public SearchField(SelenideDriver driver) {
+    super(driver.$("input[aria-label='search']"), driver);
+    this.clearSearchInputBtn = driver.$("#input-clear");
+  }
+  private final SelenideElement clearSearchInputBtn;
+
+  @Step("Perform search for query {query}")
+  @Nonnull
+  public SearchField search(String query) {
+    clearIfNotEmpty();
+    self.setValue(query).pressEnter();
+    return this;
+  }
+
+  @Step("Try to clear search field")
+  @Nonnull
+  public SearchField clearIfNotEmpty() {
+    if (self.is(not(empty))) {
+      clearSearchInputBtn.click();
+      self.should(empty);
     }
-
-    public SearchField() {
-        super($("input[aria-label='search']"));
-    }
-
-    @Step("Perform a search")
-    public SearchField search(String query) {
-        searchInput.setValue(query);
-        searchInput.pressEnter();
-        return this;
-    }
-
-    @Step("Clear search field")
-    public SearchField clearSearchField() {
-        searchInput.clear();
-        return this;
-    }
+    return this;
+  }
 }

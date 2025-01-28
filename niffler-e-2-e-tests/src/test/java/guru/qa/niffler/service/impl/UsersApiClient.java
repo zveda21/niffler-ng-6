@@ -1,159 +1,151 @@
 package guru.qa.niffler.service.impl;
 
-import com.google.common.base.Stopwatch;
 import guru.qa.niffler.api.AuthApi;
-import guru.qa.niffler.api.UserApi;
-import guru.qa.niffler.api.core.RestClient;
+import guru.qa.niffler.api.UserdataApi;
+import guru.qa.niffler.api.core.RestClient.EmptyClient;
 import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.rest.TestData;
+import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.UsersClient;
 import io.qameta.allure.Step;
-import org.apache.kafka.common.errors.TimeoutException;
+import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
+import java.util.List;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
+import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ParametersAreNonnullByDefault
 public class UsersApiClient implements UsersClient {
 
-    private static final Config CFG = Config.getInstance();
-    private static final String defaultPassword = "12345";
+  private static final Config CFG = Config.getInstance();
+  private static final String defaultPassword = "12345";
 
+  private final AuthApi authApi = new EmptyClient(CFG.authUrl()).create(AuthApi.class);
+  private final UserdataApi userdataApi = new EmptyClient(CFG.userdataUrl()).create(UserdataApi.class);
 
-    private final AuthApi authApi = new RestClient.EmptyClient(CFG.authUrl()).create(AuthApi.class);
-    private final UserApi userApi = new RestClient.EmptyClient(CFG.userdataUrl()).create(UserApi.class);
+  @NotNull
+  @Override
+  @Step("Create user using API")
+  public UserJson createUser(String username, String password) {
+    try {
+      authApi.requestRegisterForm().execute();
+      authApi.register(
+              username,
+              password,
+              password,
+              ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
+      ).execute();
+      UserJson createdUser = requireNonNull(userdataApi.currentUser(username).execute().body());
+      return createdUser.addTestData(
+              new TestData(
+                      password
+              )
+      );
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-    @Override
-    public @Nonnull UserJson createUser(@Nonnull String username, String password){
+  @Override
+  public void addIncomeInvitation(UserJson targetUser, int count) {
+    if (count > 0) {
+      for (int i = 0; i < count; i++) {
+        final String username = randomUsername();
+        final Response<UserJson> response;
+        final UserJson newUser;
         try {
-            authApi.requestRegisterForm().execute();
+          newUser = createUser(username, defaultPassword);
 
-            authApi.register(
-                    username,
-                    password,
-                    password,
-                    ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
-            ).execute();
-
-            Stopwatch sw = Stopwatch.createStarted();
-            long maxWaitTime = 5000L;
-            while (sw.elapsed(TimeUnit.MILLISECONDS) < maxWaitTime) {
-                UserJson userJson = userApi.getCurrentUser(username).execute().body();
-                if (userJson != null && userJson.id() != null) {
-                    return userJson;
-                } else {
-                    Thread.sleep(100);
-                }
-            }
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+          response = userdataApi.sendInvitation(
+                  newUser.username(),
+                  targetUser.username()
+          ).execute();
+        } catch (IOException e) {
+          throw new AssertionError(e);
         }
-        throw new TimeoutException("User registration timed out for username: " + username);
+        assertEquals(200, response.code());
+
+        targetUser.testData()
+                .incomeInvitations()
+                .add(newUser);
+      }
     }
+  }
 
-    @Step("Adding {count} incoming invitations to user: {targetUser.username}")
-    @Override
-    public void createIncomeInvitations(UserJson targetUser, int count){
-        if (count > 0) {
-            UserJson user = getCurrentUser(targetUser.username());
-            if (user == null || user.id() == null) {
-                throw new AssertionError("User with name " + targetUser.username() + " not found");
-            }
-            for (int i = 0; i < count; i++) {
-                final String username = randomUsername();
-                UserJson newUser;
+  @Override
+  public void addOutcomeInvitation(UserJson targetUser, int count) {
+    if (count > 0) {
+      for (int i = 0; i < count; i++) {
+        final String username = randomUsername();
+        final Response<UserJson> response;
+        final UserJson newUser;
+        try {
+          newUser = createUser(username, defaultPassword);
 
-                try {
-                    newUser = createUser(username, defaultPassword);
-                    Response<UserJson> response = userApi.sendInvitation(
-                            newUser.username(),
-                            user.username()
-                    ).execute();
-
-                    if (response.code() != 200) {
-                        throw new AssertionError("Failed to send invitation: " + response.message());
-                    }
-                    System.out.println("Sent invitation from " + newUser.username() + " to " + user.username());
-                    targetUser.testData().incomeInvitations().add(newUser);
-                } catch (IOException e) {
-                    throw new AssertionError("IOException occurred while adding income invitation: " + e.getMessage());
-                }
-            }
+          response = userdataApi.sendInvitation(
+                  targetUser.username(),
+                  newUser.username()
+          ).execute();
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
+        assertEquals(200, response.code());
+
+        targetUser.testData()
+                .outcomeInvitations()
+                .add(newUser);
+      }
     }
+  }
 
-
-    @Step("Adding {count} outcome invitations to user: {targetUser.username}")
-    @Override
-    public void createOutcomeInvitations(UserJson targetUser, int count) {
-        if (count > 0) {
-            UserJson user = getCurrentUser(targetUser.username());
-            if (user == null || user.id() == null) {
-                throw new AssertionError("User with name " + targetUser.username() + " not found");
-            }
-            for (int i = 0; i < count; i++) {
-                UserJson newUser = createUser(randomUsername(), "12345");
-                sendInvitation(user.username(), newUser.username());
-                System.out.println("Sent invitation from " + user.username() + " to " + newUser.username());
-            }
-        }
-    }
-
-    @Step("Adding {count} friends to user: {targetUser.username}")
-    @Override
-    public void createFriends(UserJson targetUser, int count) {
-        if (count > 0) {
-            UserJson user = getCurrentUser(targetUser.username());
-            if (user == null || user.id() == null) {
-                throw new AssertionError("User with name " + targetUser.username() + " not found");
-            }
-            for (int i = 0; i < count; i++) {
-                UserJson newUser = createUser(randomUsername(), "12345");
-                acceptInvitation(newUser.username(), user.username());
-                System.out.println("Sent invitation from " + newUser.username() + " to " + user.username());
-            }
-        }
-    }
-
-    public UserJson getCurrentUser(String username) {
+  @Override
+  public void addFriend(UserJson targetUser, int count) {
+    if (count > 0) {
+      for (int i = 0; i < count; i++) {
+        final String username = randomUsername();
         final Response<UserJson> response;
         try {
-            response = userApi.getCurrentUser(username)
-                    .execute();
+          userdataApi.sendInvitation(
+                  createUser(
+                          username,
+                          defaultPassword
+                  ).username(),
+                  targetUser.username()
+          ).execute();
+          response = userdataApi.acceptInvitation(targetUser.username(), username).execute();
         } catch (IOException e) {
-            throw new AssertionError(e);
+          throw new RuntimeException(e);
         }
         assertEquals(200, response.code());
-        return response.body();
-    }
 
-    public void sendInvitation(String addresseeUsername, String targetUsername) {
-        final Response<UserJson> response;
-        try {
-            response = userApi.sendInvitation(addresseeUsername, targetUsername)
-                    .execute();
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-        assertEquals(200, response.code());
+        targetUser.testData()
+                .friends()
+                .add(response.body());
+      }
     }
+  }
 
-    public void acceptInvitation(String receiverUsername, String username) {
-        final Response<Void> response;
-        try {
-            response = userApi.acceptInvitation(receiverUsername, username)
-                    .execute();
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-        assertEquals(200, response.code());
+  @Nonnull
+  public List<UserJson> allUsers(@Nonnull String username, @Nullable String searchQuery) {
+    final Response<List<UserJson>> response;
+    try {
+      response = userdataApi.allUsers(username, searchQuery)
+              .execute();
+    } catch (IOException e) {
+      throw new AssertionError(e);
     }
-
+    assertEquals(200, response.code());
+    return response.body() != null
+            ? response.body()
+            : Collections.emptyList();
+  }
 }

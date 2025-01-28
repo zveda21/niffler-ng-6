@@ -2,23 +2,24 @@ package guru.qa.niffler.data.dao;
 
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public interface CategoryDao {
-    CategoryEntity create(CategoryEntity category);
 
-    Optional<CategoryEntity> findCategoryById(UUID id);
+  @Nonnull
+  CategoryEntity create(CategoryEntity category);
 
-    Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName);
+  @Nonnull
+  Optional<CategoryEntity> findById(UUID id);
 
-    List<CategoryEntity> findAllByUsername(String username);
+  @Nonnull
+  List<CategoryEntity> findAll();
 
-    void deleteCategory(CategoryEntity category);
-
-    List<CategoryEntity> findAll();
-
-    CategoryEntity update(CategoryEntity category);
-
+  @Nonnull
+  CategoryEntity update(CategoryEntity category);
 }

@@ -1,98 +1,239 @@
 package guru.qa.niffler.test.web;
 
-import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.config.Config;
+import com.codeborne.selenide.SelenideDriver;
+import guru.qa.niffler.condition.Bubble;
+import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
-import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.EditSpendingPage;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
-import guru.qa.niffler.page.component.SpendingTable;
+import guru.qa.niffler.page.component.StatComponent;
+import guru.qa.niffler.utils.RandomDataUtils;
+import guru.qa.niffler.utils.ScreenDiffResult;
+import guru.qa.niffler.utils.SelenideUtils;
 import org.junit.jupiter.api.Test;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @WebTest
 public class SpendingWebTest {
 
-    private static final Config CFG = Config.getInstance();
+  private final SelenideDriver driver = new SelenideDriver(SelenideUtils.chromeConfig);
 
-    @User(
-            username = "zveda",
-            categories = @Category(
-                    archived = true
-            ),
-            spendings = @Spending(
-                    category = "Обучение 28",
-                    description = "Обучение Advanced 2.1",
-                    amount = 65990
-            )
-    )
-    @Test
-    void categoryDescriptionShouldBeChangedFromTable(SpendJson spend) {
-        final String newDescription = "Обучение Niffler Next Generation";
+  @User(
+      spendings = @Spending(
+          category = "Обучение",
+          description = "Обучение Advanced 2.0",
+          amount = 79990
+      )
+  )
+  @Test
+  void categoryDescriptionShouldBeChangedFromTable(UserJson user) {
+    final String newDescription = "Обучение Niffler Next Generation";
 
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login(spend.username(), "12345");
-        new MainPage()
-                .editSpending(spend.description())
-                .setNewSpendingDescription(newDescription)
-                .save();
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+        .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+        .getSpendingTable()
+        .editSpending("Обучение Advanced 2.0")
+        .setNewSpendingDescription(newDescription)
+        .saveSpending();
 
-        new MainPage().checkThatTableContainsSpending(newDescription);
-    }
+    new MainPage(driver).getSpendingTable()
+        .checkTableContains(newDescription);
+  }
 
-    @Test
-    public void checkIfTableContainsSpendTest() {
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login("vates5", "12345");
-        new SpendingTable()
-                .clickOnSpendCheckboxItem(1)
-                .checkTableContains("test");
-    }
+  @User
+  @Test
+  void shouldAddNewSpending(UserJson user) {
+    String category = "Friends";
+    int amount = 100;
+    Date currentDate = new Date();
+    String description = RandomDataUtils.randomSentence(3);
 
-    @User(
-            username = "zveda",
-            spendings = @Spending(
-                    category = "Обучение 42",
-                    description = "Обучение Advanced 42",
-                    amount = 65990
-            )
-    )
-    @Test
-    void searchSpendByDescriptionTest(SpendJson spendJson) {
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+        .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+        .getHeader()
+        .addSpendingPage()
+        .setNewSpendingCategory(category)
+            .setNewSpendingAmount(amount);
+    new EditSpendingPage(driver)
+        .setNewSpendingDate(currentDate)
+        .setNewSpendingDescription(description)
+        .saveSpending()
+        .checkAlertMessage("New spending is successfully created");
 
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login(spendJson.username(), "12345");
+    new MainPage(driver).getSpendingTable()
+        .checkTableContains(description);
+  }
 
-        new SpendingTable()
-                .searchSpendingByDescription(spendJson.description())
-                .selectPeriod("TODAY")
-                .checkTableContains(spendJson.description());
-    }
+  @User
+  @Test
+  void shouldNotAddSpendingWithEmptyCategory(UserJson user) {
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+        .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+        .getHeader()
+        .addSpendingPage()
+        .setNewSpendingAmount(100)
+        .setNewSpendingDate(new Date())
+        .saveSpending()
+        .checkFormErrorMessage("Please choose category");
+  }
 
-    @User(
-            username = "vates",
-            spendings = @Spending(
-                    category = "test2",
-                    description = "Test3",
-                    amount = 2345
-            )
-    )
-    @Test
-    void editSpendTest(SpendJson spendJson) {
+  @User
+  @Test
+  void shouldNotAddSpendingWithEmptyAmount(UserJson user) {
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+        .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+        .getHeader()
+        .addSpendingPage()
+        .setNewSpendingCategory("Friends")
+        .setNewSpendingDate(new Date())
+        .saveSpending()
+        .checkFormErrorMessage("Amount has to be not less then 0.01");
+  }
 
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login(spendJson.username(), "12345");
+  @User(
+      spendings = @Spending(
+          category = "Обучение",
+          description = "Обучение Advanced 2.0",
+          amount = 79990
+      )
+  )
+  @Test
+  void deleteSpendingTest(UserJson user) {
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+        .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+        .getSpendingTable()
+        .deleteSpending("Обучение Advanced 2.0")
+        .checkTableSize(0);
+  }
 
-        new SpendingTable()
-                .searchSpendingByDescription(spendJson.description())
-                .selectPeriod("TODAY")
-                .clickOnEditSpending(spendJson.description());
-        new EditSpendingPage().setCategory("test")
-                .setNewSpendingDescription("new desc")
-                .save()
-                .checkAlertMessage("Spending is edited successfully");
-    }
+  @User(
+      spendings = @Spending(
+          category = "Обучение",
+          description = "Обучение Advanced 2.0",
+          amount = 79990
+      )
+  )
+  @ScreenShotTest("img/expected-stat.png")
+  void checkStatComponentTest(UserJson user, BufferedImage expected) throws IOException, InterruptedException {
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+            .getStatComponent();
+
+    Thread.sleep(3000);
+
+    assertFalse(new ScreenDiffResult(
+            expected,
+            new StatComponent(driver).chartScreenshot()
+    ), "Screen comparison failure");
+
+    new StatComponent(driver).checkBubbles(Color.yellow);
+  }
+
+  @User(
+          spendings = @Spending(
+                  category = "Home",
+                  description = "Test",
+                  amount = 87000
+          )
+  )
+  @Test
+  void checkStatComponents(UserJson user) throws InterruptedException {
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+            .getStatComponent();
+
+    Thread.sleep(3000);
+
+    new StatComponent(driver).checkBubblesInCorrectOrder(new Bubble(
+            Color.yellow,
+            "Home 87000 ₽"
+    ));
+  }
+
+  @User(
+          categories = {
+                  @Category(name = "Shopping"),
+                  @Category(name = "Home")
+          },
+          spendings = {
+                  @Spending(
+                          category = "Shopping",
+                          description = "Test",
+                          amount = 2000
+                  ),
+                  @Spending(
+                          category = "Home",
+                          description = "Test",
+                          amount = 150
+                  )
+          }
+  )
+  @Test
+  void checkStatBubblesInAnyOrder(UserJson user) throws InterruptedException {
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+            .getStatComponent();
+    Thread.sleep(3000);
+    Bubble bubble1 = new Bubble(Color.yellow, "Shopping 2000 ₽");
+    Bubble bubble2 = new Bubble(Color.green, "Home 150 ₽");
+    new StatComponent(driver).checkBubblesInAnyOrder(bubble2, bubble1);
+  }
+
+  @User(
+          spendings = {
+                  @Spending(
+                          category = "Home",
+                          description = "Test",
+                          amount = 67000
+                  ),
+                  @Spending(
+                          category = "Shopping",
+                          description = "Test",
+                          amount = 340
+                  ),
+          }
+  )
+  @Test
+  void checkStatComponentsContains(UserJson user) throws InterruptedException {
+    driver.open(LoginPage.URL);
+    new LoginPage(driver)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage(driver))
+            .getStatComponent();
+
+    Thread.sleep(3000);
+
+    Bubble bubble_1 = new Bubble(
+            Color.green,
+            "Shopping 340 ₽"
+    );
+    new StatComponent(driver).checkBubblesContains(bubble_1);
+  }
 }

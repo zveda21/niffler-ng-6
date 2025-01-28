@@ -1,15 +1,21 @@
 package guru.qa.niffler.service;
 
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.rest.UserJson;
 
-import java.io.IOException;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
+@ParametersAreNonnullByDefault
 public interface UsersClient {
-    UserJson createUser(String username, String password);
+  @Nonnull
+  UserJson createUser(String username, String password);
 
-    void createIncomeInvitations(UserJson targetUser, int count) ;
+  void addIncomeInvitation(UserJson targetUser, int count);
 
-    void createOutcomeInvitations(UserJson targetUser, int count) ;
+  void addOutcomeInvitation(UserJson targetUser, int count);
 
-    void createFriends(UserJson targetUser, int count) ;
+  void addFriend(UserJson targetUser, int count);
+
 }

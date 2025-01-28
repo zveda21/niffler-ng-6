@@ -1,107 +1,105 @@
 package guru.qa.niffler.page.component;
 
 import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.model.rest.SpendJson;
+import guru.qa.niffler.model.rest.DataFilterValues;
 import guru.qa.niffler.page.EditSpendingPage;
 import io.qameta.allure.Step;
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
+import javax.annotation.Nonnull;
 
-public class SpendingTable extends BaseComponent<SpendingTable>{
+import static com.codeborne.selenide.ClickOptions.usingJavaScript;
+import static com.codeborne.selenide.CollectionCondition.size;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.byText;
+import static guru.qa.niffler.condition.SpendConditions.spends;
 
-    private final SelenideElement periodButton = $("#period");
-    private final SelenideElement periodList = $("ul[class^='MuiList-root']");
-    private final SelenideElement spendList = $("tbody[class^='MuiTableBody-root']");
-    private final SelenideElement deleteSpendButton = $("#delete");
-    private SearchField searchField = new SearchField();
+public class SpendingTable extends BaseComponent<SpendingTable> {
 
-    public SpendingTable() {
-        super($("#spendings"));
-    }
+  private final SearchField searchField ;
+  private final SelenideElement periodMenu ;
+  private final SelenideElement currencyMenu ;
+  private final ElementsCollection menuItems ;
+  private final SelenideElement deleteBtn ;
+  private final SelenideElement popup ;
 
-    @Step("Select a period")
-    public SpendingTable selectPeriod(String period) {
-        String selector = String.format("li[data-value='%s']", period);
-        periodButton.click();
-        SelenideElement periodOption = periodList.find(selector);
-        periodOption.click();
-        return this;
-    }
-
-    @Step("Edit spending")
-    public EditSpendingPage clickOnEditSpending(String description) {
-        SelenideElement row = $$("tbody[class^='MuiTableBody-root'] tr").stream()
-                .filter(tr -> tr.$("td:nth-child(4) > span").getText().equals(description))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("No spending found with description: " + description));
-
-        SelenideElement editButton = row.$("td > button");
-
-        if (editButton.isDisplayed() && editButton.isEnabled()) {
-            editButton.click();
-        } else {
-            throw new AssertionError("Edit button for item '" + description + "' is not clickable.");
-        }
-        return new EditSpendingPage();
-
-    }
-
-    @Step("Get spend checkbox by index")
-    private SelenideElement getSpendCheckboxByIndex(int index) {
-        String selector = String.format("tbody[class^='MuiTableBody-root'] tr:nth-child(%d) input", index);
-        return $(selector);
-    }
-
-    @Step("Click on spend checkbox item")
-    public SpendingTable clickOnSpendCheckboxItem(int index) {
-        SelenideElement spendInput = getSpendCheckboxByIndex(index);
-        spendInput.click();
-        clickOnDeleteButton();
-        return this;
-    }
-
-    @Step("Delete a spend")
-    public SpendingTable deleteSpending(String description) {
-        String selector = String.format("tbody[class^='MuiTableBody-root'] td:nth-child(4) span:contains('%s')", description);
-        SelenideElement itemToClick = $(selector);
-        itemToClick.click();
-        return this;
-    }
-
-    @Step("Click on delete button")
-    public void clickOnDeleteButton() {
-        if (deleteSpendButton.isDisplayed() && deleteSpendButton.isEnabled()) {
-            deleteSpendButton.click();
-        } else {
-            throw new IllegalStateException("Delete button is not clickable.");
-        }
-    }
-
-    @Step("Search a spend by description")
-    public SpendingTable searchSpendingByDescription(String description) {
-        searchField.search(description);
-        return this;
-    }
+  private final SelenideElement tableHeader ;
+  private final ElementsCollection headerCells ;
+  private final ElementsCollection tableRows ;
 
 
-    @Step("Check if table contains")
-    public SpendingTable checkTableContains(String... expectedSpends) {
-        ElementsCollection rows = spendList.$$("tr");
-        for (String expectedSpend : expectedSpends) {
-            boolean found = false;
-            for (SelenideElement row : rows) {
-                String actualSpend = row.$$("td").get(3).getText();
-                if (actualSpend.contains(expectedSpend)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new AssertionError("Expected spend not found in the table: " + expectedSpend);
-            }
-        }
-        return this;
+  public SpendingTable(SelenideDriver driver) {
+    super(driver.$("#spendings"), driver);
+    this.searchField = new SearchField(this.driver);
+    this.periodMenu = self.$("#period");
+    this.currencyMenu = self.$("#currency");
+    this.menuItems = this.driver.$$(".MuiList-padding li");
+    this.deleteBtn = self.$("#delete");
+    this.popup = this.driver.$("div[role='dialog']");
 
-    }
+    this.tableHeader = self.$(".MuiTableHead-root");
+    this.headerCells = tableHeader.$$(".MuiTableCell-root");
+
+    this.tableRows = self.$("tbody").$$("tr");
+  }
+
+  @Step("Select table period {0}")
+  @Nonnull
+  public SpendingTable selectPeriod(DataFilterValues period) {
+    periodMenu.click();
+    menuItems.find(text(period.text)).click();
+    return this;
+  }
+
+  @Step("Edit spending with description {0}")
+  @Nonnull
+  public EditSpendingPage editSpending(String description) {
+    searchSpendingByDescription(description);
+    SelenideElement row = tableRows.find(text(description));
+    row.$$("td").get(5).click();
+    return new EditSpendingPage(driver);
+  }
+
+  @Step("Delete spending with description {0}")
+  @Nonnull
+  public SpendingTable deleteSpending(String description) {
+    searchSpendingByDescription(description);
+    SelenideElement row = tableRows.find(text(description));
+    row.$$("td").get(0).click();
+    deleteBtn.click();
+    popup.$(byText("Delete")).click(usingJavaScript());
+    return this;
+  }
+
+  @Step("Search spending with description {0}")
+  @Nonnull
+  public SpendingTable searchSpendingByDescription(String description) {
+    searchField.search(description);
+    return this;
+  }
+
+  @Step("Check that table contains data {0}")
+  @Nonnull
+  public SpendingTable checkTableContains(String expectedSpend) {
+    searchSpendingByDescription(expectedSpend);
+    tableRows.find(text(expectedSpend)).should(visible);
+    return this;
+  }
+
+  @Step("Check that table have size {0}")
+  @Nonnull
+  public SpendingTable checkTableSize(int expectedSize) {
+    tableRows.should(size(expectedSize));
+    return this;
+  }
+
+  @Step("Check that spend table contains spends {expectedSpends}")
+  @Nonnull
+  public SpendingTable checkSpendingRows(SpendJson... expectedSpends){
+    tableRows.should(spends(expectedSpends));
+    return this;
+  }
 }

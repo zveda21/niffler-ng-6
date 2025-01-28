@@ -1,60 +1,75 @@
 package guru.qa.niffler.page.component;
 
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.page.*;
 import io.qameta.allure.Step;
 
+import javax.annotation.Nonnull;
+
 import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
 
 public class Header extends BaseComponent<Header> {
-    private final SelenideElement self = $("#root header ");
 
-    public Header(SelenideElement self) {
-        super(self);
-    }
+  private final SelenideElement mainPageLink;
+  private final SelenideElement addSpendingBtn;
+  private final SelenideElement menuBtn;
+  private final SelenideElement menu;
+  private final ElementsCollection menuItems;
 
-    public Header(){
-        super($("#root header "));
-    }
+  public Header(SelenideDriver driver) {
+    super(driver.$("#root header"), driver);
+    this.mainPageLink = self.$("a[href*='/main']");
+    this.addSpendingBtn = self.$("a[href*='/spending']");
+    this.menuBtn = self.$("button");
+    this.menu = driver.$("ul[role='menu']");
+    this.menuItems = menu.$$("li");
+  }
 
-    @Step("Check header title")
-    public void checkHeaderTitle() {
-        self.$("h1").shouldHave(text("Niffler"));
-    }
+  @Step("Open Friends page")
+  @Nonnull
+  public FriendsPage toFriendsPage() {
+    menuBtn.click();
+    menuItems.find(text("Friends")).click();
+    return new FriendsPage(driver);
+  }
 
-    private void navigateTo(String url) {
-        open(url);
-    }
+  @Step("Open All Peoples page")
+  @Nonnull
+  public PeoplePage toAllPeoplesPage() {
+    menuBtn.click();
+    menuItems.find(text("All People")).click();
+    return new PeoplePage(driver);
+  }
 
-    @Step("Navigate to FriendPage")
-    public FriendsPage toFriendsPage() {
-        navigateTo(FriendsPage.friendsPageUrl);
-        return new FriendsPage();
-    }
+  @Step("Open Profile page")
+  @Nonnull
+  public ProfilePage toProfilePage() {
+    menuBtn.click();
+    menuItems.find(text("Profile")).click();
+    return new ProfilePage(driver);
+  }
 
-    @Step("Navigate to PeoplePage")
-    public PeoplePage toAllPeoplePage() {
-        navigateTo(PeoplePage.url);
-        return new PeoplePage();
-    }
+  @Step("Sign out")
+  @Nonnull
+  public LoginPage signOut() {
+    menuBtn.click();
+    menuItems.find(text("Sign out")).click();
+    return new LoginPage(driver);
+  }
 
-    @Step("Navigate to ProfilePage")
-    public ProfilePage toProfilePage() {
-        navigateTo(ProfilePage.profilePageUrl);
-        return new ProfilePage();
-    }
+  @Step("Add new spending")
+  @Nonnull
+  public EditSpendingPage addSpendingPage() {
+    addSpendingBtn.click();
+    return new EditSpendingPage(driver);
+  }
 
-    @Step("Navigate to EditSpendingPage")
-    public EditSpendingPage addSpendingPage() {
-        navigateTo(EditSpendingPage.spendingPageUrl);
-        return new EditSpendingPage();
-    }
-
-    @Step("Navigate to MainPage")
-    public MainPage toMainPage() {
-        navigateTo(MainPage.url);
-        return new MainPage();
-    }
+  @Step("Go to main page")
+  @Nonnull
+  public MainPage toMainPage() {
+    mainPageLink.click();
+    return new MainPage(driver);
+  }
 }
