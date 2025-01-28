@@ -54,7 +54,7 @@ public class StatGraphQlTest extends BaseGraphQlTest {
     )
     @Test
     @ApiLogin
-    void statTestsjdjsak(@Token String bearerToken) {
+    void shouldReturnStatWithNonArchivedAndArchivedCategories(@Token String bearerToken) {
         final ApolloCall<StatQuery.Data> currenciesCall = apolloClient.query(StatQuery.builder()
                         .filterCurrency(null)
                         .statCurrency(null)
