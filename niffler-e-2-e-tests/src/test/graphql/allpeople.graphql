@@ -1,0 +1,25 @@
+query AllPeople($page:Int!, $size:Int!, $sort: [String!], $searchQuery:String) {
+    allPeople(page: $page, size: $size, sort: $sort, searchQuery: $searchQuery) {
+        edges {
+            cursor
+            node {
+                username
+                fullname
+                categories {
+                    id
+                    name
+                    username
+                    archived
+                }
+                friends(page: $page, size: $size) {
+                    pageInfo {
+                        hasPreviousPage
+                        hasNextPage
+                        startCursor
+                        endCursor
+                    }
+                }
+            }
+        }
+    }
+}

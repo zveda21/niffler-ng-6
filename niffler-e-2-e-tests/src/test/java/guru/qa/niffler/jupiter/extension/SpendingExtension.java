@@ -36,7 +36,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                           null,
                           new Date(),
                           spendAnno.amount(),
-                          CurrencyValues.RUB,
+                          spendAnno.currency(),
                           new CategoryJson(
                                   null,
                                   spendAnno.category(),
