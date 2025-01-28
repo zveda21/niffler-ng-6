@@ -8,10 +8,10 @@ import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 import guru.qa.niffler.data.repository.UserdataUserRepository;
 import guru.qa.niffler.data.repository.impl.AuthUserRepositorySpringJdbc;
-import guru.qa.niffler.data.repository.impl.UserdataUserRepositorySpringJdbc;
+import guru.qa.niffler.data.repository.impl.UserdataUserRepositoryJdbc;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.rest.CurrencyValues;
-import guru.qa.niffler.model.rest.FriendState;
+import guru.qa.niffler.model.rest.FriendshipStatus;
 import guru.qa.niffler.model.rest.TestData;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.UsersClient;
@@ -34,7 +34,7 @@ public class UsersDbClient implements UsersClient {
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     private final AuthUserRepository authUserRepository = new AuthUserRepositorySpringJdbc();
-    private final UserdataUserRepository userdataUserRepository = new UserdataUserRepositorySpringJdbc();
+    private final UserdataUserRepository userdataUserRepository = new UserdataUserRepositoryJdbc();
 
     private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(
             CFG.authJdbcUrl(),
@@ -82,7 +82,7 @@ public class UsersDbClient implements UsersClient {
                                                         }
                                                 )
                                         ),
-                                        FriendState.INVITE_RECEIVED
+                                        FriendshipStatus.INVITE_RECEIVED
                                 )
                         );
             }
@@ -112,7 +112,7 @@ public class UsersDbClient implements UsersClient {
                                                         }
                                                 )
                                         ),
-                                        FriendState.INVITE_RECEIVED
+                                FriendshipStatus.INVITE_RECEIVED
                                 )
                         );
             }
@@ -142,7 +142,7 @@ public class UsersDbClient implements UsersClient {
                                                         }
                                                 )
                                         ),
-                                        FriendState.FRIEND
+                                        FriendshipStatus.FRIEND
                                 )
                         );
             }

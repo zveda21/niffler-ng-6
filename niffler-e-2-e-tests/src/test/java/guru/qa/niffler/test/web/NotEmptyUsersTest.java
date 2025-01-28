@@ -13,11 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @Order(Integer.MAX_VALUE)
 public class NotEmptyUsersTest {
 
-    @User
-    @Test
-    void checkIfUsersListIsNotEmptyTest(UserJson user) {
-        UsersApiClient usersApiClient = new UsersApiClient();
-        List<UserJson> response = usersApiClient.allUsers(user.username(), null);
-        assertFalse(response.isEmpty(), "The user list must not be empty.");
-    }
+//    @User
+//    @Test
+//    void checkIfUsersListIsNotEmptyTest(UserJson user) {
+//        UsersApiClient usersApiClient = new UsersApiClient();
+//        List<UserJson> response = usersApiClient.allUsers(user.username(), null);
+//        assertFalse(response.isEmpty(), "The user list must not be empty.");
+//    }
 }

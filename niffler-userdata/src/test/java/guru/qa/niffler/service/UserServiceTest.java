@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static guru.qa.niffler.model.FriendState.INVITE_SENT;
+import static guru.qa.niffler.model.FriendshipStatus.INVITE_SENT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -152,12 +152,12 @@ class UserServiceTest {
     final List<UserJsonBulk> users = testedObject.allUsers(mainTestUserName, null);
     assertEquals(2, users.size());
     final UserJsonBulk invitation = users.stream()
-        .filter(u -> u.friendState() == INVITE_SENT)
+        .filter(u -> u.friendshipStatus() == INVITE_SENT)
         .findFirst()
         .orElseThrow(() -> new AssertionError("Friend with state INVITE_SENT not found"));
 
     final UserJsonBulk friend = users.stream()
-        .filter(u -> u.friendState() == null)
+        .filter(u -> u.friendshipStatus() == null)
         .findFirst()
         .orElseThrow(() -> new AssertionError("user without status not found"));
 
@@ -234,7 +234,7 @@ class UserServiceTest {
 
     // Asserts
     assertEquals(secondTestUserName, result.username());
-    assertEquals(INVITE_SENT, result.friendState());
+    assertEquals(INVITE_SENT, result.friendshipStatus());
     verify(userRepository, times(1)).save(mainTestUser);
   }
 
