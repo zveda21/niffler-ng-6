@@ -42,7 +42,7 @@ public class StatGraphQlTest extends BaseGraphQlTest {
                     @Spending(
                             category = "Food",
                             description = "Test",
-                            amount = 50
+                            amount = 200
                     ),
                     @Spending(
                             category = "Transport",
@@ -67,12 +67,12 @@ public class StatGraphQlTest extends BaseGraphQlTest {
         StatQuery.Stat result = data.stat;
 
         assertNotNull(data.stat);
-        assertEquals(200.0, result.total, "Total should match the combined spending amount");
+        assertEquals(350.0, result.total, "Total should match the combined spending amount");
         assertFalse(result.statByCategories.isEmpty(), "Stat by categories should not be empty");
 
         // Assert the response contains non archived category
         boolean hasFirstNonArchivedCategory = result.statByCategories.stream()
-                .anyMatch(category -> category.categoryName.equals("Food") && category.sum == 50.0);
+                .anyMatch(category -> category.categoryName.equals("Food") && category.sum == 200.0);
         Assertions.assertTrue(hasFirstNonArchivedCategory, "Food category should be included in the response");
 
         // Assert the response contains archived category
