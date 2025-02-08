@@ -184,6 +184,7 @@ services:
       - BUILD_URL=${BUILD_URL}
       - HEAD_COMMIT_MESSAGE=${HEAD_COMMIT_MESSAGE}
       - EXECUTION_TYPE=${EXECUTION_TYPE}
+      - BROWSER-TYPE=${BROWSER-TYPE}
     volumes:
       - allure-results:/niffler/niffler-e-2-e-tests/build/allure-results
     depends_on:
