@@ -68,9 +68,4 @@ enum LocalConfig implements Config {
     return "127.0.0.1";
   }
 
-  @Nonnull
-  @Override
-  public String ghUrl() {
-    return "https://api.github.com/";
-  }
 }
