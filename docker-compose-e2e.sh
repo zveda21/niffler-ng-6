@@ -1,24 +1,39 @@
 #!/bin/bash
 source ./docker.properties
+export COMPOSE_PROFILES=test
 export PROFILE=docker
 export PREFIX="${IMAGE_PREFIX}"
 export ALLURE_DOCKER_API=http://allure:5050/
 export HEAD_COMMIT_MESSAGE="local build"
-export FRONT_VERSION="2.1.0"
-export COMPOSE_PROFILES=test
 export ARCH=$(uname -m)
+
+# Default values
+BROWSER="chrome"      # Default browser is Chrome
+SKIP_BUILD=false      # By default, do not skip the build
+
+# Parsing command-line arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    chrome|firefox)
+      BROWSER="$1"
+      ;;
+    --skip-build)
+      SKIP_BUILD=true
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+export BROWSER_TYPE=$BROWSER
 
 echo '### Java version ###'
 java --version
 
-if [[ "$1" = "gql" ]]; then
-  export FRONT="niffler-ng-gql-client"
-else
-  export FRONT="niffler-ng-client"
-fi
-
 docker compose down
-
 docker_containers=$(docker ps -a -q)
 docker_images=$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'niffler')
 
@@ -33,6 +48,8 @@ if [ ! -z "$docker_images" ]; then
   docker rmi $docker_images
 fi
 
+echo '### Java version ###'
+java --version
 bash ./gradlew clean
 bash ./gradlew jibDockerBuild -x :niffler-e-2-e-tests:test
 
